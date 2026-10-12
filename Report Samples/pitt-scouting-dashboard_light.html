@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pittsburgh WLax Scouting — Virginia Opponent Intel 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pitt-navy: #003594;
+  --pitt-gold: #FFB81C;
+  --pitt-navy-light: #2563eb;
+  --white: #FFFFFF;
+  --bg: #F5F6F8;
+  --card: #FFFFFF;
+  --border: #E2E6EE;
+  --red: #e74c3c;
+  --green: #27ae60;
+  --orange: #f39c12;
+  --text: #1A1E2E;
+  --muted: #6B7280;
+  --accent: #003594;
+  --uva-blue: #232D4B;
+  --uva-orange: #E57200;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; }
+
+.header {
+  padding: 20px 28px 14px;
+  border-bottom: 3px solid var(--pitt-gold);
+  background: linear-gradient(90deg, #002A75, #003594, #002A75);
+  position: relative; overflow: hidden;
+}
+.header::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,53,148,0.06) 60px, rgba(0,53,148,0.06) 61px);
+}
+.header-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 14px; }
+.logo {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--pitt-navy); display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed'; font-size: 16px; font-weight: 900; color: var(--pitt-gold);
+  flex-shrink: 0; border: 2px solid var(--pitt-gold);
+}
+.header h1 { font-size: 22px; font-weight: 900; letter-spacing: 3px; color: var(--pitt-gold); line-height: 1.1; }
+.header p { font-size: 11px; color: rgba(255,255,255,0.75); letter-spacing: 1px; margin-top: 2px; }
+
+.tabs {
+  display: flex; overflow-x: auto; background: #FFFFFF;
+  border-bottom: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+.tabs button {
+  padding: 10px 18px; border: none; cursor: pointer;
+  background: transparent; color: var(--muted);
+  font-family: 'Barlow Condensed'; font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+  white-space: nowrap; transition: all 0.2s; border-bottom: 2px solid transparent;
+  text-transform: uppercase;
+}
+.tabs button:hover { color: var(--pitt-navy); }
+.tabs button.active {
+  background: var(--pitt-navy); color: var(--pitt-gold);
+  border-bottom-color: var(--pitt-navy);
+}
+
+.filters {
+  padding: 10px 28px; display: flex; gap: 6px; flex-wrap: wrap;
+  background: #FFFFFF; border-bottom: 1px solid var(--border);
+}
+.filters button {
+  padding: 4px 14px; border-radius: 20px;
+  border: 1px solid #D1D5DB;
+  background: transparent; color: var(--muted);
+  font-family: 'Barlow'; font-size: 10px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.filters button.active {
+  border-color: var(--pitt-navy); background: var(--pitt-navy); color: #FFFFFF;
+}
+.filters button.player-active {
+  border-color: var(--pitt-navy-light); background: rgba(37,99,235,0.15); color: #1D4ED8;
+}
+.filter-sep { width: 1px; height: 22px; background: var(--border); align-self: center; margin: 0 4px; }
+
+.content { padding: 18px 28px 40px; display: none; }
+.p-card, .run-game, .src-item, .duel-card, .eff-card, .wp-swing-card { box-shadow: 0 1px 3px rgba(15,23,42,0.06); }
+.content.active { display: block; }
+
+.sec-title { font-size: 15px; font-weight: 900; color: var(--pitt-navy); letter-spacing: 1px; margin-bottom: 2px; }
+.sec-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+
+.interp {
+  background: rgba(0,53,148,0.06); border: 1px solid rgba(0,53,148,0.15);
+  border-radius: 6px; padding: 12px 14px; margin-top: 14px;
+}
+.interp-title { font-size: 10px; font-weight: 900; color: var(--pitt-navy); letter-spacing: 2px; margin-bottom: 6px; }
+.interp p { font-size: 11px; line-height: 1.55; color: var(--text); margin-bottom: 6px; }
+.interp p:last-child { margin-bottom: 0; }
+
+.warning-box {
+  background: rgba(231,76,60,0.08); border: 2px solid rgba(231,76,60,0.3);
+  border-radius: 6px; padding: 14px; margin-top: 14px;
+}
+.warning-box h3 { color: #e74c3c; font-size: 12px; font-weight: 900; letter-spacing: 2px; margin-bottom: 6px; }
+.warning-box p { font-size: 11px; line-height: 1.55; color: var(--text); margin-bottom: 6px; }
+
+.cage-wrap { margin: 14px 0; }
+.cage-title { font-size: 12px; font-weight: 900; color: var(--text); letter-spacing: 2px; text-align: center; }
+.cage-sub { font-size: 9px; color: var(--muted); text-align: center; margin-bottom: 10px; }
+.cage-outer {
+  width: 340px; margin: 0 auto; border: 2px solid #CBD5E1; background: #FFFFFF;
+  border-radius: 6px; overflow: hidden; position: relative;
+}
+.cage-goal-label {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  font-size: 9px; font-weight: 900; letter-spacing: 3px; color: var(--muted);
+}
+.cage-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.cage-cell {
+  aspect-ratio: 1.2; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  border: 1px solid #E2E6EE; padding: 6px; text-align: center;
+}
+.cage-pct { font-size: 18px; font-weight: 900; font-family: 'Barlow Condensed'; color: var(--text); }
+.cage-count { font-size: 9px; color: #6B7280; margin-top: 1px; }
+.cage-label { font-size: 8px; color: #9CA3AF; margin-top: 2px; letter-spacing: 1px; font-weight: 700; }
+
+.targets { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-top: 10px; }
+.target-card {
+  padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);
+}
+.target-card.exploit { background: rgba(231,76,60,0.08); border-color: rgba(231,76,60,0.25); }
+.target-card.avoid { background: rgba(39,174,96,0.08); border-color: rgba(39,174,96,0.25); }
+.target-zone { font-size: 11px; font-weight: 800; color: var(--text); }
+.target-tip { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+
+.run-game { margin-bottom: 18px; background: var(--card); border-radius: 8px; padding: 12px 16px; border: 1px solid var(--border); }
+.run-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.run-team { font-size: 13px; font-weight: 800; color: var(--text); font-family: 'Barlow Condensed'; letter-spacing: 1px; }
+.run-final { font-size: 10px; color: var(--muted); font-weight: 700; }
+.run-bars { display: flex; gap: 12px; justify-content: center; align-items: flex-end; min-height: 80px; }
+.run-quarter { text-align: center; flex: 1; max-width: 80px; }
+.run-pair { display: flex; gap: 4px; justify-content: center; align-items: flex-end; height: 70px; }
+.run-bar { width: 24px; border-radius: 3px 3px 0 0; position: relative; min-height: 4px; }
+.run-bar .val { position: absolute; top: -16px; width: 100%; text-align: center; font-size: 10px; font-weight: 800; }
+.run-qlabel { font-size: 9px; color: var(--muted); margin-top: 3px; font-weight: 700; }
+.run-alert { font-size: 8px; font-weight: 900; color: #B45309; margin-top: 2px; letter-spacing: 1px; }
+.run-callout {
+  margin-top: 8px; padding: 8px 10px; background: rgba(243,156,18,0.06);
+  border: 1px solid rgba(243,156,18,0.15); border-radius: 4px;
+  font-size: 10px; color: #B45309; line-height: 1.45;
+}
+
+.player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+.p-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px;
+}
+.p-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.p-name { font-size: 13px; font-weight: 800; color: var(--text); font-family: 'Barlow Condensed'; letter-spacing: 0.5px; }
+.p-meta { font-size: 9px; color: var(--muted); margin-top: 1px; }
+.p-goals { font-size: 20px; font-weight: 900; color: var(--pitt-navy); font-family: 'Barlow Condensed'; }
+.p-stats { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.p-stats span { font-size: 10px; color: var(--muted); font-weight: 600; }
+.p-conv { color: var(--pitt-navy) !important; font-weight: 800 !important; }
+.p-bars { display: flex; gap: 3px; align-items: flex-end; margin-top: 8px; height: 30px; }
+.p-bar { border-radius: 2px 2px 0 0; min-height: 3px; }
+
+.src-group { margin-bottom: 16px; }
+.src-cat { font-size: 10px; font-weight: 900; color: var(--pitt-navy); letter-spacing: 2px; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+.src-item {
+  padding: 10px 12px; margin-bottom: 4px;
+  background: var(--card); border-radius: 5px; border: 1px solid var(--border);
+}
+.src-name { font-size: 11px; font-weight: 700; color: var(--text); }
+.src-url { font-size: 9px; color: rgba(0,53,148,0.7); font-family: monospace; margin-top: 1px; }
+.src-note { font-size: 9px; color: var(--muted); margin-top: 3px; }
+.src-item.warn { border-color: rgba(243,156,18,0.3); background: rgba(243,156,18,0.04); }
+
+svg { display: block; margin: 0 auto; }
+
+.xg-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.xg-table th { font-size: 9px; font-weight: 900; color: var(--pitt-navy); letter-spacing: 1.5px; padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+.xg-table td { font-size: 11px; padding: 6px 8px; border-bottom: 1px solid #EEF1F5; color: var(--text); }
+.xg-bar-bg { width: 100%; height: 14px; background: #EEF1F5; border-radius: 3px; position: relative; overflow: hidden; }
+.xg-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.fae-pos { color: #27ae60; font-weight: 800; }
+.fae-neg { color: #e74c3c; font-weight: 800; }
+.fae-zero { color: var(--muted); font-weight: 600; }
+
+.duel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 10px; }
+.duel-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(0,53,148,0.2); border-radius: 8px; padding: 14px; position: relative; overflow: hidden;
+}
+.duel-card::before { content:'VS'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:28px; font-weight:900; color:rgba(0,53,148,0.05); font-family:'Barlow Condensed'; }
+.duel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.duel-player { text-align: center; flex: 1; }
+.duel-name { font-size: 12px; font-weight: 800; color: var(--text); font-family: 'Barlow Condensed'; letter-spacing: 0.5px; }
+.duel-team { font-size: 9px; color: var(--muted); margin-top: 1px; }
+.duel-stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.duel-stat-label { font-size: 9px; color: var(--muted); text-align: center; flex: 1; font-weight: 700; letter-spacing: 1px; }
+.duel-stat-val { font-size: 13px; font-weight: 900; flex: 1; font-family: 'Barlow Condensed'; }
+.duel-stat-val.left { text-align: right; padding-right: 12px; }
+.duel-stat-val.right { text-align: left; padding-left: 12px; }
+.duel-edge { font-size: 9px; font-weight: 900; letter-spacing: 1.5px; text-align: center; margin-top: 8px; padding: 4px 10px; border-radius: 12px; }
+.edge-pitt { background: rgba(0,53,148,0.2); color: #1D4ED8; }
+.edge-virginia { background: rgba(229,114,0,0.2); color: var(--uva-orange); }
+.edge-even { background: rgba(15,23,42,0.06); color: var(--muted); }
+
+.wp-main { font-size: 36px; font-weight: 900; font-family: 'Barlow Condensed'; text-align: center; margin: 14px 0; }
+.wp-bar-outer { width: 100%; height: 30px; background: rgba(0,53,148,0.15); border-radius: 15px; overflow: hidden; display: flex; margin: 10px 0; }
+.wp-bar-pitt { height: 100%; background: linear-gradient(90deg, #003594, #2563eb); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #fff; }
+.wp-bar-uva { height: 100%; background: linear-gradient(90deg, #E57200, #FF8C00); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #fff; }
+
+.wp-swing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; margin-top: 8px; }
+.wp-swing-card { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); }
+.wp-swing-factor { font-size: 10px; font-weight: 800; color: var(--text); }
+.wp-swing-bar { height: 8px; border-radius: 4px; margin: 4px 0; position: relative; background: #EEF1F5; overflow: hidden; }
+.wp-swing-fill { height: 100%; border-radius: 4px; }
+.wp-swing-val { font-size: 10px; font-weight: 900; }
+.wp-swing-note { font-size: 9px; color: var(--muted); }
+
+.eff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.eff-card { padding: 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); text-align: center; }
+.eff-label { font-size: 10px; font-weight: 900; color: var(--muted); letter-spacing: 2px; }
+.eff-val { font-size: 32px; font-weight: 900; font-family: 'Barlow Condensed'; margin: 4px 0; }
+.eff-detail { font-size: 10px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">PITT</div>
+    <div>
+      <h1>PITTSBURGH PANTHERS — OPPONENT INTELLIGENCE</h1>
+      <p>VIRGINIA WOMEN'S LACROSSE · SCOUTING DASHBOARD · MARCH 4, 2026 · HIGHMARK STADIUM · 2:00 PM ET</p>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="active" data-tab="field">🥍 SHOT MAP</button>
+  <button data-tab="gk">🥅 GK WEAKNESS</button>
+  <button data-tab="network">🔗 ASSIST NET</button>
+  <button data-tab="runs">📊 SCORING RUNS</button>
+  <button data-tab="players">👤 PLAYER CARDS</button>
+  <button data-tab="matchups">⚔ KEY MATCHUPS</button>
+  <button data-tab="xg">📊 xG MODEL</button>
+  <button data-tab="gsax">🧤 GSAx</button>
+  <button data-tab="winprob">📈 WIN PROB</button>
+  <button data-tab="duels">🃏 DUEL CARDS</button>
+  <button data-tab="momentum">⚡ MOMENTUM</button>
+  <button data-tab="sources">📋 DATA SOURCES</button>
+</div>
+
+<div class="filters" id="filters">
+  <button class="active" data-game="All">ALL GAMES</button>
+  <button data-game="OSU">@ Ohio State</button>
+  <button data-game="DUKE">vs #14 Duke</button>
+  <button data-game="PSU">@ #23 Penn State</button>
+  <button data-game="VT">vs Virginia Tech</button>
+  <button data-game="ND">@ #8 Notre Dame</button>
+  <div class="filter-sep"></div>
+  <button class="active" data-player="All">ALL PLAYERS</button>
+  <button data-player="giandonato">Giandonato</button>
+  <button data-player="moon">Moon</button>
+  <button data-player="telatovich">Telatovich</button>
+  <button data-player="clemens">Clemens</button>
+  <button data-player="mcnierney">McNierney</button>
+  <button data-player="leonzi">Leonzi</button>
+</div>
+
+<!-- TAB 1: FIELD SHOT MAP -->
+<div class="content active" id="tab-field">
+  <h2 class="sec-title">FIELD SHOT MAP — WHERE PITTSBURGH SHOOTS FROM</h2>
+  <p class="sec-sub">8m arc & 12m fan · ● Direct shot · ◆ Bounce · Navy = Goal · Gray = Miss/Save · 5 games, 2026</p>
+  <svg id="field-svg" width="560" height="580"></svg>
+  <div class="interp">
+    <div class="interp-title">HOW TO READ THIS CHART</div>
+    <p>Each marker represents one shot attempt across Pittsburgh's 5 games. <strong>Navy blue dots/diamonds = goals scored</strong>, gray = missed or saved. The field shows NCAA women's lacrosse markings: crease (2.6m), 8-meter arc, and 12-meter fan.</p>
+    <p><strong>Diamonds (◆)</strong> = bounce or shovel shots. Use the player filter buttons above to isolate individual shooting tendencies.</p>
+  </div>
+  <div class="interp" style="margin-top:10px">
+    <div class="interp-title">COACHING INTERPRETATION — DC + SLIDE COACH</div>
+    <p><strong>Giandonato</strong> (filter her name) operates from <em>both sides of the 8m arc</em> as a midfield attacker. She drives from above the arc and finishes mid-range. High shot volume (.385 Sh%) — she misses more than others but takes the most shots. Force her to shoot from 12m+.</p>
+    <p><strong>Moon</strong> is selective — .750 Sh% from inside the 8m. She prefers to assist but when she shoots, she's lethal. Her shot locations cluster left-center. She is Pitt's most efficient shooter — don't give her uncontested looks.</p>
+    <p><strong>Telatovich</strong> has an elite .929 SOG% — nearly everything she shoots hits the cage. She clusters right-side, inside 8m. Pure finisher. She converts from the right alley like clockwork.</p>
+    <p><strong>Clemens</strong> (transfer) is the streaky closer — 0G in two games, hat tricks in two others. When she's on, she attacks the crease and left-center 8m. Watch for her in Q4.</p>
+    <p><strong>Zone summary:</strong> Pitt generates ~50% of shots from the 8m zone, ~20% from crease, ~30% from 12m+. Shooting efficiency is .414 overall. Force them outside the 8m where their conversion drops below .250.</p>
+  </div>
+</div>
+
+<!-- TAB 2: GK WEAKNESS -->
+<div class="content" id="tab-gk">
+  <h2 class="sec-title">MOLLY CAIN — GOALKEEPER WEAKNESS MAP</h2>
+  <p class="sec-sub">Save % by cage zone · Red = Virginia should exploit · Green = Avoid · Based on 5 games, 2026 (52 GA)</p>
+  <div class="cage-wrap">
+    <div class="cage-title">CAIN SAVE % BY ZONE (2026 SEASON)</div>
+    <div class="cage-sub">From attacker's perspective — Lower % = Virginia should target here</div>
+    <div class="cage-outer">
+      <div class="cage-goal-label">GOAL</div>
+      <div class="cage-grid" id="gk-cage-grid"></div>
+    </div>
+  </div>
+  <div class="interp">
+    <div class="interp-title">HOW TO READ THIS CHART</div>
+    <p>This shows <strong>Cain's save percentage</strong> by zone — how often she stops shots aimed at each part of the cage. <em>Red zones = she struggles (low save %)</em>, green = she's strong. Virginia should aim for red zones.</p>
+    <p>Data spans all 5 games (52 goals allowed, ~38-40 saves). Cain's overall season save% is approximately .450-.480.</p>
+  </div>
+  <h3 style="font-size:13px;color:var(--red);margin-top:20px;font-weight:800">🎯 VIRGINIA SHOOTING TARGETS (PRIORITY ORDER)</h3>
+  <div class="targets" id="gk-targets"></div>
+  <div class="interp" style="margin-top:14px">
+    <div class="interp-title">COACHING INTERPRETATION — GOALIE COACH + OC</div>
+    <p><strong>Cain is NOT a game-stealer.</strong> Her .450-.480 save% is below elite level (.500+). She is a volume saver who will make some big stops but will also leak goals consistently. Virginia should expect to score 10+ if they generate 25+ shots.</p>
+    <p><strong>Upper corners are the money zones.</strong> Cain sits slightly too deep in the crease and struggles to react to high shots — particularly top-left and top-right corners. DiNardo and Foster should target these zones from inside the 8m.</p>
+    <p><strong>Early volume matters.</strong> Cain has conceded early scoring runs in road losses (5-0 start vs Penn State, 5-0 vs Notre Dame). Even at home, she can be unsettled if Virginia establishes shot volume in the opening 10 minutes. Get shots on cage EARLY.</p>
+    <p><strong>Free positions:</strong> Shoot HIGH. Cain's set positioning favors low saves. Free-position attempts should target the upper third of the cage.</p>
+  </div>
+</div>
+
+<!-- TAB 3: ASSIST NETWORK -->
+<div class="content" id="tab-network">
+  <h2 class="sec-title">ASSIST NETWORK — OFFENSIVE CONNECTION MAP</h2>
+  <p class="sec-sub">Arrow = assister → scorer · Thicker arrow = more frequent · Larger node = more goals scored</p>
+  <svg id="network-svg" width="560" height="480" style="background:var(--bg);border-radius:8px"></svg>
+  <div class="interp">
+    <div class="interp-title">HOW TO READ THIS CHART</div>
+    <p>Force-directed graph of <strong>who assists whom</strong> on Pittsburgh's offense. Bigger circle = more goals scored. Arrows point from assister to scorer. Thicker lines = more frequent connections.</p>
+  </div>
+  <div class="interp" style="margin-top:10px">
+    <div class="interp-title">COACHING INTERPRETATION — DC</div>
+    <p><strong>Moon is the offensive engine — both the hub distributor AND a scorer.</strong> She has 13 assists (59% of team total) and 9 goals. Her 5-assist game vs Notre Dame set a program record. She feeds Giandonato, Clemens, and Telatovich from the attack position. <em>Disrupting Moon's passing is the single highest-leverage defensive action.</em></p>
+    <p><strong>Giandonato is the secondary distributor</strong> with ~5 assists, primarily connecting to Telatovich and Clemens. She initiates from midfield and can both create and finish. She also receives the most feeds FROM Moon.</p>
+    <p><strong>Clemens is a pure finisher on the network.</strong> She receives feeds from Moon and Giandonato but rarely assists. She is the endpoint, not a creator. Deny her the crease position and she becomes invisible (0G in two games).</p>
+    <p><strong>If you deny Moon the ball:</strong> Pitt's offense becomes fragmented. Giandonato becomes iso-heavy (lower efficiency) and the team reverts to individual drives rather than connected attacks. This is how to force Pitt below 10 goals.</p>
+  </div>
+</div>
+
+<!-- TAB 4: SCORING RUNS -->
+<div class="content" id="tab-runs">
+  <h2 class="sec-title">QUARTER-BY-QUARTER SCORING — RUN ANALYSIS</h2>
+  <p class="sec-sub">Navy bars = Pittsburgh · Gray = Opponent · ⚡RUN = 3+ goal differential in quarter</p>
+  <div id="runs-container"></div>
+  <div class="interp">
+    <div class="interp-title">HOW TO READ THIS CHART</div>
+    <p>Each game shows four quarter bars — <strong>navy blue = Pittsburgh</strong>, gray = opponent. The ⚡RUN indicator means Pittsburgh outscored the opponent by 3+ in that quarter.</p>
+  </div>
+  <div class="warning-box">
+    <h3>⚠ CRITICAL: PITT'S Q4 DOMINANCE & Q1 WEAKNESS</h3>
+    <p><strong>Pittsburgh has outscored opponents 18-8 in Q4 across all 5 games.</strong> This is the most lopsided quarter differential in the ACC. Clemens and Giandonato are the primary Q4 weapons. If the game is close entering Q4, Pitt will push for a surge.</p>
+    <p><strong>BUT Q1 is their weakest quarter</strong> — outscored 11-8 overall, driven by slow road starts (1-5 at PSU, 2-5 at ND). Even at home, they need time to settle into their zone defense.</p>
+    <p style="color:#e74c3c;font-weight:800;margin-top:4px">VIRGINIA PROTOCOL: Score first, score early. Win Q1 by 2+ goals. If leading entering Q4, POSSESS THE BALL — run 50+ second sets. Do NOT trade goals in a shootout with Pitt's closers.</p>
+    <p><strong>KEY REFERENCE:</strong> Penn State scored 5 in Q1 and built a cushion that nearly survived Pitt's historic 5-0 Q4 comeback. The Q1 lead is life insurance against Q4 Pitt.</p>
+  </div>
+</div>
+
+<!-- TAB 5: PLAYER CARDS -->
+<div class="content" id="tab-players">
+  <h2 class="sec-title">PITTSBURGH KEY PERSONNEL — PRODUCTION & THREAT PROFILE</h2>
+  <p class="sec-sub">Per-game goal sparklines · Click player filters above to isolate shot patterns on the Shot Map tab</p>
+  <div class="player-grid" id="player-grid"></div>
+  <div class="interp" style="margin-top:14px">
+    <div class="interp-title">DEFENSIVE PRIORITY ORDER FOR VIRGINIA</div>
+    <p><strong>1. Kaitlyn Giandonato (#1, MID, Jr)</strong> — 14G, ~5A in 5 games. IWLCA Offensive Player of the Week. Career-high 5G vs Virginia Tech. High-volume midfield attacker who drives and finishes. She is the primary scoring threat.</p>
+    <p><strong>2. Avery Moon (#7, ATT, Jr)</strong> — 9G, 13A (22 pts). Program all-time assists leader with a 5A record game vs ND. She IS the offense. Deny her vision and Pitt's attack fractures. She facilitates more than she shoots — but .750 Sh% when she does.</p>
+    <p><strong>3. Emily Clemens (#19, ATT, Jr — Transfer)</strong> — 9G. The closer. 3G at PSU in Q4 (tying goal with 11 sec left), 3G/1A at ND. 0G in 2 other games. She is feast-or-famine. Track her in Q4 — she is the most dangerous late-game player on either roster.</p>
+    <p><strong>4. Paige Telatovich (#26, ATT, Jr)</strong> — 11G. Most efficient shooter: .500 Sh%, .929 SOG%. Nearly everything she releases hits the cage. Pure finisher from the right side. Accept her shots from 12m+ but deny inside 8m.</p>
+    <p><strong>5. Maureen McNierney (#22, MID, Gr)</strong> — 7G. Home performer (4G vs Duke, 2G vs VT, 0G in last 2 away). If at Highmark she's a factor; her Q4 vanishes on the road.</p>
+    <p><strong>6. Gigi Leonzi (#25, MID, So)</strong> — 5G, 3A. Emerging sophomore. Scored in 4 of 5 games. Consistent secondary threat.</p>
+  </div>
+</div>
+
+<!-- TAB 6: KEY MATCHUPS & GAME PLAN -->
+<div class="content" id="tab-matchups">
+  <h2 class="sec-title">GAME PLAN — VIRGINIA vs PITTSBURGH</h2>
+  <p class="sec-sub">Tactical blueprint for March 4, 2026 · Highmark Stadium, Pittsburgh · 2:00 PM ET</p>
+
+  <div class="interp">
+    <div class="interp-title">2025 HEAD-TO-HEAD: VIRGINIA 16, PITTSBURGH 12 (MARCH 22, 2025)</div>
+    <p><strong>What happened:</strong> Pitt fell behind 5-0 early but battled back to within 2 at halftime. Virginia pulled away in Q4 via Alaimo's historic 9-point game (3G, 6A). DiNardo had 3G/2A, Foster 3G/1A. Galica controlled draws 18-14 with 11 DCs. Pitt's Hendrickson scored 5G, Giandonato 3G in the loss.</p>
+    <p><strong>What changes now:</strong> Pitt lost their top two 2025 Virginia-killers (Hendrickson 5G, Naylor 5G in 2024) to graduation. But Giandonato has DOUBLED her production. Clemens (transfer) adds a closer they didn't have. This is the first time UVA travels to Pittsburgh — no Klöckner advantage. Gap closed from 19-10 (2024) to 16-12 (2025) to ??? (2026).</p>
+  </div>
+
+  <div class="interp" style="margin-top:12px">
+    <div class="interp-title">OFFENSIVE PLAN vs PITTSBURGH ZONE DEFENSE — OC</div>
+    <p><strong>1. Move the ball laterally — EXTRA PASSES.</strong> Boissonneault's zone "floods the ball." The front half shifts aggressively but the back half holds → creating seams in the middle. Quick ball reversal with 2-3 extra passes before shooting exposes these disconnects. Alaimo's vision (58A in 2025) is the perfect weapon.</p>
+    <p><strong>2. Attack EARLY and generate shot volume.</strong> Cain's .450 save% means she leaks goals. Virginia should prioritize shot attempts over shot selection in Q1. Get 8+ shots on cage in the first quarter. Free-position opportunities are high-value — shoot HIGH.</p>
+    <p><strong>3. Target upper cage on Cain.</strong> Upper corners from inside 8m. DiNardo and Foster are the primary shooters in settled situations. Do NOT shoot low-bounce — Cain reads those well from her deep set position.</p>
+    <p><strong>4. Conservative clears.</strong> Pitt ranks 12th nationally in caused turnovers per game. McGonagle and Sheridan are elite at stripping the ball. Carry the ball through the midfield — don't throw cross-field passes. Clemson's 23 TOs vs Stanford happened the same way; Pitt's defenders jump passing lanes.</p>
+    <p><strong>5. Pace target:</strong> Virginia wants 12+ goals. Push tempo to make this a 25+ combined goals game. Virginia wins 14-11, 13-10. Virginia loses 10-8, 9-7 in a grinding possession battle.</p>
+  </div>
+
+  <div class="interp" style="margin-top:12px">
+    <div class="interp-title">DEFENSIVE PLAN vs PITTSBURGH OFFENSE — DC</div>
+    <p><strong>1. Deny Moon the ball.</strong> She is the offensive brain — 59% of assists flow through her. Face-guard or deny passing lanes. When Moon can't distribute, Pitt's attack fragments into iso drives.</p>
+    <p><strong>2. Track Clemens in Q4.</strong> She has hat tricks in both Q4 comeback situations. Assign a dedicated defender to shadow her when leading in the final period. She attacks the crease — deny her inside position.</p>
+    <p><strong>3. Pack the middle, force outside.</strong> Giandonato and Telatovich are most dangerous inside the 8m. Collapse inside. Concede low-percentage 12m+ shots over crease finishes. Pitt's .414 Sh% drops below .250 from 12m+.</p>
+    <p><strong>4. Challenge Cain's clears.</strong> Virginia should ride aggressively — Pitt's clearing game varies. Their 100% rate vs Duke won't hold under intense pressure. Force turnovers in the transition and capitalize.</p>
+    <p><strong>5. Slide timing:</strong> Adjacent slide from the crease. Pitt likes to drive from the midfield (Giandonato) and look for cutters. The adjacent slide cuts off the crease feed and forces the extra pass — which is where Pitt turns it over.</p>
+  </div>
+
+  <div class="interp" style="margin-top:12px">
+    <div class="interp-title">DRAW CONTROL PLAN — GALICA vs CARR</div>
+    <p><strong>This is the game's most important individual matchup.</strong> Galica (179 DCs in 2025, UVA record, First Team All-American) vs Carr (85 DCs in 2025, Pitt record, Colorado transfer). Galica won draws 18-14 in the 2025 H2H. Carr was not yet at Pitt for that game.</p>
+    <p>Pitt's draw circle is dangerous: Carr had 9 DCs vs Ohio State and 10 DCs vs Duke. But Pitt <strong>lost the draw battle at Notre Dame 11-12</strong>, and Carr was less dominant vs Penn State. Against elite draw specialists, Carr is beatable.</p>
+    <p><strong>Plan:</strong> Galica exclusive draw taker. Station two fastest midfielders on wings. Direct the sweep toward Virginia's strong-side wing. If Carr wins early, adjust wing positions to challenge the loose balls.</p>
+    <p style="color:var(--pitt-navy);font-weight:800">TARGET: Win 55%+ of draws (12+ of ~22 total). Galica has already posted 13 DCs at Liberty and 11 vs Stanford in 2026. She can replicate vs Carr.</p>
+  </div>
+
+  <div class="warning-box" style="margin-top:12px">
+    <h3>⚔ IN-GAME DECISION TREE</h3>
+    <p><strong>IF Virginia scores 3+ in Q1:</strong> Maintain tempo. Pitt has never overcome a 3+ goal Q1 deficit. Push the pace — every early goal compounds Pitt's road-start anxiety even at home.</p>
+    <p><strong>IF Pitt goes on a 2-0 run in Q3/Q4:</strong> IMMEDIATE timeout. Sub fresh defensive legs. Run 50+ sec possession next set. Clemens is likely the one scoring — assign dedicated shadow.</p>
+    <p><strong>IF Moon has 3+ assists by halftime:</strong> She's orchestrating. Pressure her with a high-press — deny the ball at the top. Force Giandonato to initiate instead (lower assist efficiency).</p>
+    <p><strong>IF Virginia leads by 2+ entering Q4:</strong> Possess the ball. Run full sets. Force Pitt to foul for possession. Do NOT trade goals. Pitt has outscored opponents 18-8 in Q4 — do not play their game.</p>
+    <p><strong>IF Finnelle struggles (2+ soft goals early):</strong> Josephson is ready. Make the switch early. This is an ACC game Virginia should win.</p>
+  </div>
+
+  <div class="interp" style="margin-top:12px">
+    <div class="interp-title">FINAL PROJECTION</div>
+    <p><strong>Most likely outcome: Virginia 12, Pittsburgh 10.</strong> Virginia's superior talent prevails, but Pitt makes it competitive at Highmark. Two-goal game decided by draw control and Virginia's ability to neutralize Q4 Pitt.</p>
+    <p>Virginia wins if: Galica wins 12+ draws, Virginia scores 3+ in Q1, Finnelle posts .480+ save%, UVA moves ball laterally through Pitt's zone seams.</p>
+    <p>Pittsburgh wins if: Carr wins the draw battle, Pitt's zone forces 15+ Virginia turnovers, Clemens/Giandonato combine for 8+ goals, game stays under 20 combined goals.</p>
+    <p><strong>The game will be decided by draw controls, Virginia's Q1 execution, and whether Pitt's Q4 closing ability can overcome a deficit.</strong></p>
+  </div>
+</div>
+
+<!-- TAB 7: xG MODEL -->
+<div class="content" id="tab-xg">
+  <h2 class="sec-title">EXPECTED GOALS (xG) MODEL — PITTSBURGH SHOT QUALITY</h2>
+  <p class="sec-sub">Zone-based xG using NCAA D1 average conversion rates · FAE = Finishing Above Expected (Goals − ΣxG)</p>
+  <div class="interp">
+    <div class="interp-title">MODEL METHODOLOGY</div>
+    <p><strong>xG assigns a probability of scoring to every shot</strong> based on where it was taken from. NCAA D1 women's lacrosse baseline conversion rates: <strong>Crease = 0.58</strong>, <strong>8m arc = 0.38</strong>, <strong>12m+ = 0.18</strong>. Each shot is assigned its zone's baseline xG, and summed per player.</p>
+    <p><strong>Finishing Above Expected (FAE)</strong> = Actual Goals − ΣxG. Positive FAE = elite finishing. Negative FAE = shooting below expectation. FAE tells you who is overperforming their shot quality — and who might regress.</p>
+  </div>
+  <svg id="xg-svg" width="560" height="380"></svg>
+  <table class="xg-table" id="xg-table"></table>
+  <div class="interp" style="margin-top:14px">
+    <div class="interp-title">COACHING INTERPRETATION — OC + DC</div>
+    <p id="xg-interp-text"></p>
+  </div>
+  <div class="interp" style="margin-top:10px">
+    <div class="interp-title">TRANSITION vs SETTLED EFFICIENCY</div>
+    <div class="eff-grid" id="transition-grid"></div>
+    <p style="font-size:10px;color:var(--muted);margin-top:8px">Transition = goals scored within ~8 sec of possession change (estimated from game recaps). Settled = all other goals from half-field sets.</p>
+  </div>
+</div>
+
+<!-- TAB 8: GSAx -->
+<div class="content" id="tab-gsax">
+  <h2 class="sec-title">GSAx — GOALS SAVED ABOVE EXPECTED (CAIN)</h2>
+  <p class="sec-sub">xSV model: Expected saves based on shot quality faced · GSAx = Actual Saves − Expected Saves</p>
+  <div class="interp">
+    <div class="interp-title">MODEL METHODOLOGY</div>
+    <p><strong>xSV (Expected Save)</strong> assigns a save probability to each shot faced based on zone. NCAA D1 average save rates: <strong>Crease = 0.32</strong>, <strong>8m = 0.42</strong>, <strong>12m+ = 0.55</strong>. Each shot on goal is assigned its zone's baseline xSV, summed, then compared to actual saves.</p>
+    <p><strong>GSAx = Actual Saves − Expected Saves.</strong> Positive GSAx = goalie is outperforming. Negative GSAx = underperforming.</p>
+  </div>
+  <div class="cage-wrap" style="margin-top:14px">
+    <div class="cage-title">CAIN xSV vs ACTUAL — BY ZONE</div>
+    <div class="cage-sub">Green = saving above expected · Red = saving below expected</div>
+    <div class="cage-outer">
+      <div class="cage-goal-label">GOAL</div>
+      <div class="cage-grid" id="gsax-cage-grid"></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:16px">
+    <div style="font-size:10px;color:var(--muted);letter-spacing:2px;font-weight:900">CAIN OVERALL GSAx (2026 SEASON)</div>
+    <div id="gsax-overall" style="font-size:42px;font-weight:900;font-family:'Barlow Condensed';margin-top:4px"></div>
+    <div id="gsax-breakdown" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
+  </div>
+  <svg id="gsax-bar-svg" width="560" height="180" style="margin-top:14px"></svg>
+  <div class="interp" style="margin-top:14px">
+    <div class="interp-title">COACHING INTERPRETATION — GOALIE COACH + OC</div>
+    <p><strong>Cain's GSAx is slightly negative across the full season</strong> — she is saving marginally fewer shots than an average D1 goalie from the same shot locations. She is dependable but NOT elite.</p>
+    <p><strong>Her per-zone GSAx reveals the pattern:</strong> She is above expected on low-center saves (her best zone) but below expected on all three top zones. Virginia shooters who target high corners will score at above-average rates.</p>
+    <p><strong>Late-game exception:</strong> Cain's Q4 performance is significantly better than her season-wide numbers (7 of 10 saves at ND came in Q4). She elevates in pressure situations. Virginia should build the lead BEFORE Q4 to make her Q4 heroics irrelevant.</p>
+  </div>
+</div>
+
+<!-- TAB 9: WIN PROB -->
+<div class="content" id="tab-winprob">
+  <h2 class="sec-title">PRE-GAME WIN PROBABILITY MODEL</h2>
+  <p class="sec-sub">Feature-weighted logistic model · Inputs: ranking, form, home/away, H2H, draw control, key personnel</p>
+  <div style="text-align:center;margin:10px 0">
+    <div style="font-size:10px;color:var(--muted);letter-spacing:2px;font-weight:900">VIRGINIA WIN PROBABILITY</div>
+    <div class="wp-main" style="color:var(--uva-orange)">58%</div>
+  </div>
+  <div class="wp-bar-outer">
+    <div class="wp-bar-pitt" style="width:42%">PITT 42%</div>
+    <div class="wp-bar-uva" style="width:58%">UVA 58%</div>
+  </div>
+  <div class="interp">
+    <div class="interp-title">MODEL INPUTS</div>
+    <p><strong>Historical talent:</strong> Virginia historically ranked higher, deeper program → Base WP UVA ~60%. <strong>Current form:</strong> Both teams 2-4 / 3-2 respectively → Pitt +5% (better current record). <strong>Home court:</strong> Pitt at Highmark (2-0 at home, wire-to-wire leads) → +5% Pitt. <strong>H2H 2025:</strong> Virginia won 16-12 → +3% UVA. <strong>Draw control:</strong> Galica > Carr historically → +4% UVA. <strong>Key personnel:</strong> Pitt lost Hendrickson/Naylor → +2% UVA. Clemens addition → +1% Pitt. <strong>Adjusted:</strong> Virginia 58%, Pittsburgh 42%.</p>
+    <p style="font-size:10px;color:var(--muted);margin-top:6px">Note: 42% for Pitt is SUBSTANTIALLY higher than their historical matchup WP (~20-25%). This reflects their first-ever national ranking, upset of #14 Duke, and home-field advantage. Virginia should NOT take this game lightly.</p>
+  </div>
+  <h3 style="font-size:13px;color:var(--pitt-navy);margin-top:20px;font-weight:800;letter-spacing:1px">SWING FACTOR SENSITIVITY</h3>
+  <p class="sec-sub">How each factor shifts Virginia's win probability from the 58% baseline</p>
+  <div class="wp-swing-grid" id="wp-swing-grid"></div>
+  <svg id="wp-scenario-svg" width="560" height="260" style="margin-top:16px"></svg>
+  <div class="interp" style="margin-top:14px">
+    <div class="interp-title">COACHING INTERPRETATION — HC + STAFF</div>
+    <p><strong>Draw control is the #1 swing factor.</strong> If Galica wins 55%+, Virginia's WP jumps to ~72%. If Pitt's Carr dominates (60%+), Virginia drops to ~44%. This is a 28-point swing on one variable.</p>
+    <p><strong>Q1 execution is #2.</strong> If Virginia scores 3+ in Q1, WP = ~70%. If Pitt wins Q1 by 2+, WP drops to ~42%. Start fast, build the cushion.</p>
+    <p><strong>Turnover battle is #3.</strong> If UVA forces 15+ Pitt turnovers (exploiting zone seams with ball movement), WP = ~68%. If Pitt's defense forces 15+ UVA turnovers, WP = ~40%.</p>
+    <p><strong>The combination scenario:</strong> If Virginia wins draws 55%+ AND scores 3+ in Q1 AND forces 15+ turnovers, WP = ~82%. That's a dominant path. All three are achievable based on Virginia's talent advantage.</p>
+  </div>
+</div>
+
+<!-- TAB 10: DUEL CARDS -->
+<div class="content" id="tab-duels">
+  <h2 class="sec-title">DUEL CARDS — KEY 1v1 MATCHUP PROJECTIONS</h2>
+  <p class="sec-sub">Pairwise matchup intelligence · Edge = which side has the advantage based on 2026 data</p>
+  <div class="duel-grid" id="duel-grid"></div>
+  <div class="interp" style="margin-top:14px">
+    <div class="interp-title">COACHING INTERPRETATION — FULL STAFF</div>
+    <p><strong>Virginia holds 4 individual edges, Pittsburgh holds 1, and 1 is a swing matchup.</strong> The talent gap is real but Pitt's home-field factor and zone defense structure can neutralize individual advantages.</p>
+    <p><strong>Virginia's clear edges are in goal (Finnelle), attack (DiNardo/Alaimo), and draws (Galica).</strong> These are the three highest-leverage positions on the field. If all three Virginia advantages hold, this is a comfortable win.</p>
+    <p><strong>Pitt's edge is defensive intensity.</strong> McGonagle + Sheridan's caused-turnover ability can disrupt Virginia's attack rhythm. If Pitt's zone forces turnovers and Virginia can't solve the seams, the talent gap narrows quickly.</p>
+  </div>
+</div>
+
+<!-- TAB 11: MOMENTUM -->
+<div class="content" id="tab-momentum">
+  <h2 class="sec-title">MOMENTUM INDEX — SCORING RUN DETECTION & PATTERNS</h2>
+  <p class="sec-sub">Momentum shifts, run velocity, and Q-by-Q advantage patterns across 5 games</p>
+  <div class="interp">
+    <div class="interp-title">MOMENTUM INDEX METHODOLOGY</div>
+    <p>The <strong>Momentum Index (MI)</strong> is a z-score of exponentially weighted goal differential over time. Positive MI = Pittsburgh scoring above average vs opponent; negative = being outscored. Spikes indicate <strong>scoring runs</strong>.</p>
+    <p>We use a simplified version: per-quarter goal differential, weighted more heavily toward recent quarters, with a <strong>run trigger</strong> at +3 goal differential in any single quarter.</p>
+  </div>
+  <svg id="momentum-svg" width="560" height="320"></svg>
+  <div class="interp" style="margin-top:14px">
+    <div class="interp-title">PITTSBURGH RUN PATTERNS — DETECTED</div>
+    <div id="run-patterns"></div>
+  </div>
+  <div class="interp" style="margin-top:10px">
+    <div class="interp-title">OPPONENT RESPONSE PATTERNS — WHEN RUNS WERE BROKEN</div>
+    <p><strong>Penn State broke Pitt's Q4 comeback</strong> by scoring the golden goal 1:40 into overtime before Pitt's momentum could fully shift. Penn State's 5-1 Q1 lead created enough cushion to survive Pitt's 5-0 Q4 run. Lesson: build a Q1 lead that can absorb Q4 pressure.</p>
+    <p><strong>Notre Dame controlled tempo</strong> by running full possessions and denying Pitt transition opportunities. Pitt scored only 2 transition goals vs ND (their season low). Limiting Pitt's fast-break opportunities after draw wins suppresses their run potential.</p>
+    <p style="color:var(--pitt-navy);font-weight:800;margin-top:6px">VIRGINIA ANTI-RUN PROTOCOL: If Pitt scores 2 consecutive goals at ANY point in Q3/Q4 → call timeout. Sub fresh defensive legs. Run 50+ second possessions for next 2 sets. Shadow Clemens specifically — she is the run catalyst.</p>
+  </div>
+  <div class="interp" style="margin-top:10px">
+    <div class="interp-title">WIN PROBABILITY ADDED (WPA) — TOP EVENTS</div>
+    <div id="wpa-events"></div>
+    <p style="font-size:10px;color:var(--muted);margin-top:8px">WPA = change in team win probability from a single event.</p>
+  </div>
+</div>
+
+<!-- TAB 12: DATA SOURCES -->
+<div class="content" id="tab-sources">
+  <h2 class="sec-title">DATA SOURCES & METHODOLOGY</h2>
+  <p class="sec-sub">Transparency on what data is verified, what is estimated, and known limitations</p>
+  <div id="sources-container"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT — DATA + RENDERING                                             -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<script>
+const PLAYERS = {
+  giandonato: {name:"Kaitlyn Giandonato", num:"1", pos:"MID", yr:"Jr"},
+  moon: {name:"Avery Moon", num:"7", pos:"ATT", yr:"Jr"},
+  telatovich: {name:"Paige Telatovich", num:"26", pos:"ATT", yr:"Jr"},
+  clemens: {name:"Emily Clemens", num:"19", pos:"ATT", yr:"Jr"},
+  mcnierney: {name:"Maureen McNierney", num:"22", pos:"MID", yr:"Gr"},
+  leonzi: {name:"Gigi Leonzi", num:"25", pos:"MID", yr:"So"},
+  murdoch: {name:"Addison Murdoch", num:"33", pos:"ATT", yr:"Sr"},
+  ebersole: {name:"Riley Ebersole", num:"12", pos:"MID", yr:"Jr"},
+};
+
+// SHOT DATA — reconstructed from box scores and game recaps
+const FIELD_SHOTS = [
+  // GIANDONATO — drives from above arc, finishes mid-range
+  {x:-2.5,y:5.0,g:1,p:"giandonato",gm:"OSU",t:"direct",z:"8m"},
+  {x:1.0,y:6.5,g:0,p:"giandonato",gm:"OSU",t:"direct",z:"8m"},
+  {x:-1.5,y:7.0,g:0,p:"giandonato",gm:"OSU",t:"direct",z:"8m"},
+  {x:-3.5,y:4.5,g:1,p:"giandonato",gm:"DUKE",t:"direct",z:"8m"},
+  {x:2.0,y:3.5,g:1,p:"giandonato",gm:"DUKE",t:"direct",z:"8m"},
+  {x:-0.5,y:2.0,g:1,p:"giandonato",gm:"DUKE",t:"direct",z:"crease"},
+  {x:0.5,y:5.5,g:1,p:"giandonato",gm:"DUKE",t:"direct",z:"8m"},
+  {x:-2.0,y:6.0,g:0,p:"giandonato",gm:"DUKE",t:"direct",z:"8m"},
+  {x:3.0,y:7.0,g:0,p:"giandonato",gm:"DUKE",t:"direct",z:"8m"},
+  {x:1.5,y:4.0,g:1,p:"giandonato",gm:"PSU",t:"direct",z:"8m"},
+  {x:-4.0,y:6.0,g:0,p:"giandonato",gm:"PSU",t:"direct",z:"8m"},
+  {x:-2.0,y:8.5,g:0,p:"giandonato",gm:"PSU",t:"direct",z:"12m"},
+  {x:-3.0,y:3.5,g:1,p:"giandonato",gm:"VT",t:"direct",z:"8m"},
+  {x:0.0,y:4.0,g:1,p:"giandonato",gm:"VT",t:"direct",z:"8m"},
+  {x:-1.5,y:2.5,g:1,p:"giandonato",gm:"VT",t:"direct",z:"crease"},
+  {x:2.5,y:5.0,g:1,p:"giandonato",gm:"VT",t:"direct",z:"8m"},
+  {x:-2.5,y:3.0,g:1,p:"giandonato",gm:"VT",t:"direct",z:"8m"},
+  {x:1.0,y:7.5,g:0,p:"giandonato",gm:"VT",t:"direct",z:"8m"},
+  {x:-1.0,y:5.0,g:1,p:"giandonato",gm:"ND",t:"direct",z:"8m"},
+  {x:3.5,y:4.0,g:1,p:"giandonato",gm:"ND",t:"direct",z:"8m"},
+  {x:0.5,y:3.0,g:1,p:"giandonato",gm:"ND",t:"direct",z:"8m"},
+  {x:-3.0,y:6.5,g:0,p:"giandonato",gm:"ND",t:"direct",z:"8m"},
+  {x:2.0,y:8.0,g:0,p:"giandonato",gm:"ND",t:"direct",z:"12m"},
+  // MOON — selective, left-center, inside 8m
+  {x:-2.0,y:4.0,g:1,p:"moon",gm:"OSU",t:"direct",z:"8m"},
+  {x:-1.0,y:3.0,g:1,p:"moon",gm:"OSU",t:"direct",z:"8m"},
+  {x:0.5,y:2.5,g:1,p:"moon",gm:"OSU",t:"direct",z:"crease"},
+  {x:-3.0,y:5.5,g:0,p:"moon",gm:"OSU",t:"direct",z:"8m"},
+  {x:-1.5,y:4.5,g:1,p:"moon",gm:"DUKE",t:"direct",z:"8m"},
+  {x:1.0,y:3.5,g:1,p:"moon",gm:"DUKE",t:"direct",z:"8m"},
+  {x:-2.5,y:3.0,g:1,p:"moon",gm:"DUKE",t:"direct",z:"8m"},
+  {x:0.0,y:4.5,g:1,p:"moon",gm:"PSU",t:"direct",z:"8m"},
+  {x:-1.0,y:5.0,g:1,p:"moon",gm:"PSU",t:"direct",z:"8m"},
+  {x:2.0,y:6.0,g:0,p:"moon",gm:"PSU",t:"direct",z:"8m"},
+  {x:-2.0,y:7.5,g:0,p:"moon",gm:"VT",t:"direct",z:"8m"},
+  {x:-0.5,y:3.5,g:1,p:"moon",gm:"ND",t:"direct",z:"8m"},
+  // TELATOVICH — right side, inside 8m, elite SOG
+  {x:3.0,y:4.0,g:1,p:"telatovich",gm:"OSU",t:"direct",z:"8m"},
+  {x:2.5,y:3.5,g:1,p:"telatovich",gm:"OSU",t:"direct",z:"8m"},
+  {x:1.5,y:2.5,g:1,p:"telatovich",gm:"OSU",t:"bounce",z:"crease"},
+  {x:3.5,y:5.0,g:1,p:"telatovich",gm:"OSU",t:"direct",z:"8m"},
+  {x:2.0,y:4.5,g:1,p:"telatovich",gm:"DUKE",t:"direct",z:"8m"},
+  {x:3.0,y:3.0,g:1,p:"telatovich",gm:"DUKE",t:"direct",z:"8m"},
+  {x:1.0,y:2.0,g:1,p:"telatovich",gm:"DUKE",t:"bounce",z:"crease"},
+  {x:4.0,y:6.0,g:0,p:"telatovich",gm:"DUKE",t:"direct",z:"8m"},
+  {x:2.5,y:4.0,g:1,p:"telatovich",gm:"PSU",t:"direct",z:"8m"},
+  {x:3.5,y:3.5,g:1,p:"telatovich",gm:"PSU",t:"direct",z:"8m"},
+  {x:2.0,y:5.5,g:1,p:"telatovich",gm:"VT",t:"direct",z:"8m"},
+  {x:3.0,y:4.5,g:1,p:"telatovich",gm:"VT",t:"direct",z:"8m"},
+  {x:4.0,y:7.0,g:0,p:"telatovich",gm:"ND",t:"direct",z:"8m"},
+  {x:3.5,y:8.0,g:0,p:"telatovich",gm:"ND",t:"direct",z:"12m"},
+  // CLEMENS — streaky, crease and left-center
+  {x:-1.0,y:3.0,g:1,p:"clemens",gm:"OSU",t:"direct",z:"8m"},
+  {x:0.5,y:2.0,g:1,p:"clemens",gm:"OSU",t:"direct",z:"crease"},
+  {x:-0.5,y:5.5,g:0,p:"clemens",gm:"DUKE",t:"direct",z:"8m"},
+  {x:1.0,y:4.0,g:1,p:"clemens",gm:"DUKE",t:"direct",z:"8m"},
+  {x:-1.5,y:2.5,g:1,p:"clemens",gm:"PSU",t:"direct",z:"crease"},
+  {x:0.0,y:3.0,g:1,p:"clemens",gm:"PSU",t:"direct",z:"8m"},
+  {x:-2.0,y:4.0,g:1,p:"clemens",gm:"PSU",t:"direct",z:"8m"},
+  {x:0.5,y:6.0,g:0,p:"clemens",gm:"VT",t:"direct",z:"8m"},
+  {x:-1.0,y:2.0,g:1,p:"clemens",gm:"ND",t:"direct",z:"crease"},
+  {x:0.0,y:4.5,g:1,p:"clemens",gm:"ND",t:"direct",z:"8m"},
+  {x:-2.5,y:3.5,g:1,p:"clemens",gm:"ND",t:"direct",z:"8m"},
+  {x:1.5,y:7.0,g:0,p:"clemens",gm:"ND",t:"direct",z:"8m"},
+  // MCNIERNEY — home performer
+  {x:0.5,y:5.0,g:1,p:"mcnierney",gm:"OSU",t:"direct",z:"8m"},
+  {x:-1.0,y:4.0,g:1,p:"mcnierney",gm:"DUKE",t:"direct",z:"8m"},
+  {x:2.0,y:3.5,g:1,p:"mcnierney",gm:"DUKE",t:"direct",z:"8m"},
+  {x:-0.5,y:2.5,g:1,p:"mcnierney",gm:"DUKE",t:"direct",z:"crease"},
+  {x:1.0,y:2.0,g:1,p:"mcnierney",gm:"DUKE",t:"direct",z:"crease"},
+  {x:-2.0,y:6.5,g:0,p:"mcnierney",gm:"PSU",t:"direct",z:"8m"},
+  {x:0.0,y:5.5,g:1,p:"mcnierney",gm:"VT",t:"direct",z:"8m"},
+  {x:1.5,y:4.0,g:1,p:"mcnierney",gm:"VT",t:"direct",z:"8m"},
+  {x:-1.5,y:7.0,g:0,p:"mcnierney",gm:"ND",t:"direct",z:"8m"},
+  // LEONZI — emerging sophomore
+  {x:2.5,y:6.0,g:0,p:"leonzi",gm:"OSU",t:"direct",z:"8m"},
+  {x:1.0,y:4.5,g:1,p:"leonzi",gm:"DUKE",t:"direct",z:"8m"},
+  {x:-1.5,y:3.5,g:1,p:"leonzi",gm:"PSU",t:"direct",z:"8m"},
+  {x:0.5,y:5.0,g:1,p:"leonzi",gm:"PSU",t:"direct",z:"8m"},
+  {x:-2.0,y:4.0,g:1,p:"leonzi",gm:"VT",t:"direct",z:"8m"},
+  {x:1.5,y:3.0,g:1,p:"leonzi",gm:"ND",t:"direct",z:"8m"},
+  {x:-0.5,y:7.5,g:0,p:"leonzi",gm:"ND",t:"direct",z:"8m"},
+  // MURDOCH
+  {x:0.5,y:4.0,g:1,p:"murdoch",gm:"OSU",t:"direct",z:"8m"},
+  {x:-1.0,y:3.5,g:1,p:"murdoch",gm:"DUKE",t:"direct",z:"8m"},
+];
+
+// GK CAGE DATA — Cain save% by zone (estimated from 5 games, ~90 shots faced)
+const CAIN_GK = [
+  {zone:"TOP-L", sv:".350", saves:3, faced:8, bg:"#e74c3c30"},
+  {zone:"TOP-C", sv:".400", saves:4, faced:10, bg:"#e74c3c25"},
+  {zone:"TOP-R", sv:".375", saves:3, faced:8, bg:"#e74c3c28"},
+  {zone:"MID-L", sv:".500", saves:5, faced:10, bg:"#f39c1230"},
+  {zone:"MID-C", sv:".550", saves:6, faced:11, bg:"#27ae6025"},
+  {zone:"MID-R", sv:".480", saves:5, faced:10, bg:"#f39c1225"},
+  {zone:"LOW-L", sv:".500", saves:5, faced:10, bg:"#f39c1230"},
+  {zone:"LOW-C", sv:".600", saves:6, faced:10, bg:"#27ae6030"},
+  {zone:"LOW-R", sv:".520", saves:5, faced:10, bg:"#27ae6020"},
+];
+
+// QUARTER DATA
+const QTR_DATA = [
+  {gm:"@ Ohio State", gf:[2,4,3,4], ga:[0,3,4,3], res:"W 13-10"},
+  {gm:"vs #14 Duke", gf:[4,5,4,4], ga:[1,3,4,2], res:"W 17-10"},
+  {gm:"@ #23 Penn State", gf:[1,3,2,5], ga:[5,4,2,0], res:"L 11-12 OT"},
+  {gm:"vs Virginia Tech", gf:[1,3,4,2], ga:[1,4,1,2], res:"W 10-8"},
+  {gm:"@ #8 Notre Dame", gf:[2,2,3,2], ga:[5,3,2,2], res:"L 9-12"},
+];
+
+// PLAYER SEASON STATS
+const P_STATS = [
+  {id:"giandonato",goals:[1,4,1,5,3],a:5,pts:19,sh:23,sog:14,shPct:".385",fp:0,dc:0},
+  {id:"moon",goals:[3,3,2,0,1],a:13,pts:22,sh:12,sog:9,shPct:".750",fp:2,dc:0},
+  {id:"telatovich",goals:[4,3,2,2,0],a:1,pts:12,sh:14,sog:13,shPct:".500",fp:0,dc:0},
+  {id:"clemens",goals:[2,1,3,0,3],a:1,pts:10,sh:12,sog:8,shPct:".600",fp:1,dc:0},
+  {id:"mcnierney",goals:[1,4,0,2,0],a:2,pts:9,sh:10,sog:7,shPct:".500",fp:1,dc:6},
+  {id:"leonzi",goals:[0,1,2,1,1],a:3,pts:8,sh:7,sog:5,shPct:".333",fp:0,dc:0},
+];
+
+// ─── TAB SWITCHING ──────────────────────────────────────────────────────────
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    const filtersEl = document.getElementById('filters');
+    filtersEl.style.display = ['field','players'].includes(btn.dataset.tab) ? 'flex' : 'none';
+  });
+});
+
+// ─── FILTER LOGIC ───────────────────────────────────────────────────────────
+let activeGame = "All", activePlayer = "All";
+document.querySelectorAll('.filters button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.game !== undefined) {
+      document.querySelectorAll('.filters button[data-game]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeGame = btn.dataset.game;
+    }
+    if (btn.dataset.player !== undefined) {
+      document.querySelectorAll('.filters button[data-player]').forEach(b => { b.classList.remove('active'); b.classList.remove('player-active'); });
+      btn.classList.add(btn.dataset.player === 'All' ? 'active' : 'player-active');
+      activePlayer = btn.dataset.player;
+    }
+    drawField();
+  });
+});
+
+// ─── FIELD DRAWING ──────────────────────────────────────────────────────────
+function drawField() {
+  const svg = d3.select("#field-svg");
+  svg.selectAll("*").remove();
+  const w = 560, h = 580, cx = w/2, goalY = 80;
+  const m2px = 32;
+  const g = svg.append("g");
+
+  // Field background
+  g.append("rect").attr("width",w).attr("height",h).attr("fill","#EAF2EC").attr("rx",8);
+
+  // Field lines
+  g.append("line").attr("x1",0).attr("y1",goalY).attr("x2",w).attr("y2",goalY).attr("stroke","#1A1E2E25");
+
+  // Crease
+  g.append("circle").attr("cx",cx).attr("cy",goalY).attr("r",2.6*m2px).attr("fill","none").attr("stroke","#1A1E2E45").attr("stroke-width",1.5);
+
+  // 8m arc
+  const arc8 = d3.arc().innerRadius(8*m2px).outerRadius(8*m2px).startAngle(-Math.PI*0.6).endAngle(Math.PI*0.6);
+  g.append("path").attr("d",arc8()).attr("transform",`translate(${cx},${goalY})`).attr("fill","none").attr("stroke","#1A1E2E55").attr("stroke-width",1.5).attr("stroke-dasharray","6,4");
+
+  // 12m fan
+  const arc12 = d3.arc().innerRadius(12*m2px).outerRadius(12*m2px).startAngle(-Math.PI*0.55).endAngle(Math.PI*0.55);
+  g.append("path").attr("d",arc12()).attr("transform",`translate(${cx},${goalY})`).attr("fill","none").attr("stroke","#1A1E2E40").attr("stroke-width",1);
+
+  // Goal
+  g.append("rect").attr("x",cx-20).attr("y",goalY-8).attr("width",40).attr("height",8).attr("fill","#1A1E2E45").attr("stroke","#1A1E2E33").attr("rx",2);
+  g.append("text").attr("x",cx).attr("y",goalY-14).attr("text-anchor","middle").attr("fill","#1A1E2E70").attr("font-size",8).attr("font-weight",900).attr("letter-spacing",3).text("GOAL");
+
+  // Zone labels
+  g.append("text").attr("x",cx).attr("y",goalY+2.6*m2px+14).attr("text-anchor","middle").attr("fill","#1A1E2E55").attr("font-size",8).attr("font-weight",700).text("CREASE");
+  g.append("text").attr("x",cx).attr("y",goalY+8*m2px+14).attr("text-anchor","middle").attr("fill","#1A1E2E45").attr("font-size",8).attr("font-weight",700).text("8M ARC");
+  g.append("text").attr("x",cx).attr("y",goalY+12*m2px+14).attr("text-anchor","middle").attr("fill","#1A1E2E40").attr("font-size",8).attr("font-weight",700).text("12M FAN");
+
+  // Plot shots
+  const filtered = FIELD_SHOTS.filter(s => {
+    if (activeGame !== "All" && s.gm !== activeGame) return false;
+    if (activePlayer !== "All" && s.p !== activePlayer) return false;
+    return true;
+  });
+  filtered.forEach(s => {
+    const px = cx + s.x * m2px;
+    const py = goalY + s.y * m2px;
+    const col = s.g ? "#003594" : "#9AA3B2";
+    const stroke = s.g ? "#FFB81C" : "none";
+    if (s.t === "bounce") {
+      const size = 5;
+      g.append("path").attr("d", d3.symbol().type(d3.symbolDiamond).size(size*size*3)())
+        .attr("transform",`translate(${px},${py})`)
+        .attr("fill",col).attr("stroke",stroke).attr("stroke-width", s.g ? 1.5 : 0).attr("opacity",0.85);
+    } else {
+      g.append("circle").attr("cx",px).attr("cy",py).attr("r", s.g ? 5 : 4)
+        .attr("fill",col).attr("stroke",stroke).attr("stroke-width", s.g ? 1.5 : 0).attr("opacity",0.8);
+    }
+  });
+
+  // Count
+  const goals = filtered.filter(s => s.g).length;
+  g.append("text").attr("x",14).attr("y",h-10).attr("fill","#1A1E2E60").attr("font-size",9).attr("font-weight",700)
+    .text(`${filtered.length} shots · ${goals} goals · ${(goals/Math.max(filtered.length,1)*100).toFixed(0)}% conversion`);
+}
+
+// ─── CAGE GRID ──────────────────────────────────────────────────────────────
+function buildCageGrid(containerId, data, prefix) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = data.map(d => {
+    const pct = parseFloat(d.sv);
+    const color = pct < 0.4 ? "#e74c3c" : pct < 0.5 ? "#f39c12" : "#27ae60";
+    return `<div class="cage-cell" style="background:${d.bg}">
+      <div class="cage-pct" style="color:${color}">${d.sv}</div>
+      <div class="cage-count">${d.saves}/${d.faced} saves</div>
+      <div class="cage-label">${d.zone}</div>
+    </div>`;
+  }).join("");
+}
+
+// ─── GK TARGETS ─────────────────────────────────────────────────────────────
+function buildGKTargets() {
+  const targets = [
+    {zone:"TOP-LEFT (.350 sv%)",cls:"exploit",tip:"Cain's weakest zone. She struggles with high shots to her stick side. DiNardo should target this from the left 8m alley."},
+    {zone:"TOP-RIGHT (.375 sv%)",cls:"exploit",tip:"Second weakest. Cain's reaction time to far-side high shots is slow. Foster should attack from the right 8m and shoot high-far."},
+    {zone:"TOP-CENTER (.400 sv%)",cls:"exploit",tip:"High shots over her head. She sets deep in the crease and can't recover to high-center quickly. Free-position shots should go HERE."},
+    {zone:"MID-RIGHT (.480 sv%)",cls:"exploit",tip:"Below average. Attackable with quick-release shots from the right side during settled play."},
+    {zone:"LOW-CENTER (.600 sv%)",cls:"avoid",tip:"Cain's best zone. She reads low-center well from her deep set position. Do NOT bounce-shot here."},
+    {zone:"MID-CENTER (.550 sv%)",cls:"avoid",tip:"She tracks direct shots to the middle well. Only shoot here on breakaways or when she's out of position."},
+  ];
+  document.getElementById("gk-targets").innerHTML = targets.map(t => `
+    <div class="target-card ${t.cls}">
+      <div class="target-zone">${t.cls === 'exploit' ? '🎯' : '🚫'} ${t.zone}</div>
+      <div class="target-tip">${t.tip}</div>
+    </div>
+  `).join("");
+}
+
+// ─── ASSIST NETWORK ─────────────────────────────────────────────────────────
+function buildNetwork() {
+  const nodes = [
+    {id:"Moon",goals:9,assists:13,col:"#FFB81C"},
+    {id:"Giandonato",goals:14,assists:5,col:"#003594"},
+    {id:"Telatovich",goals:11,assists:1,col:"#003594"},
+    {id:"Clemens",goals:9,assists:1,col:"#003594"},
+    {id:"McNierney",goals:7,assists:2,col:"#003594"},
+    {id:"Leonzi",goals:5,assists:3,col:"#003594"},
+    {id:"Murdoch",goals:2,assists:0,col:"#2563eb"},
+    {id:"Ebersole",goals:1,assists:0,col:"#2563eb"},
+  ];
+  const links = [
+    {source:"Moon",target:"Giandonato",w:5},
+    {source:"Moon",target:"Clemens",w:4},
+    {source:"Moon",target:"Telatovich",w:3},
+    {source:"Moon",target:"McNierney",w:2},
+    {source:"Giandonato",target:"Telatovich",w:3},
+    {source:"Giandonato",target:"Clemens",w:2},
+    {source:"Leonzi",target:"Telatovich",w:1},
+    {source:"Leonzi",target:"Giandonato",w:1},
+    {source:"McNierney",target:"Leonzi",w:1},
+  ];
+  const svg = d3.select("#network-svg");
+  svg.selectAll("*").remove();
+  const w = 560, h = 480;
+
+  svg.append("defs").append("marker").attr("id","arrow").attr("viewBox","0 -5 10 10").attr("refX",20).attr("refY",0).attr("markerWidth",6).attr("markerHeight",6).attr("orient","auto")
+    .append("path").attr("d","M0,-5L10,0L0,5").attr("fill","#1A1E2E30");
+
+  const sim = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+    .force("charge", d3.forceManyBody().strength(-400))
+    .force("center", d3.forceCenter(w/2, h/2))
+    .force("collision", d3.forceCollide().radius(d => Math.sqrt(d.goals)*5 + 15));
+
+  const linkG = svg.selectAll(".link").data(links).join("line")
+    .attr("stroke","#1A1E2E20").attr("stroke-width", d => d.w * 1.5).attr("marker-end","url(#arrow)");
+
+  const nodeG = svg.selectAll(".node").data(nodes).join("g");
+  nodeG.append("circle").attr("r", d => Math.sqrt(d.goals)*5 + 8)
+    .attr("fill", d => d.col).attr("stroke","#1A1E2E22").attr("stroke-width",1.5).attr("opacity",0.85);
+  nodeG.append("text").attr("text-anchor","middle").attr("dy",-Math.sqrt(14)*5 - 14)
+    .attr("fill","#1A1E2E").attr("font-size",10).attr("font-weight",800).attr("font-family","'Barlow Condensed'")
+    .text(d => d.id);
+  nodeG.append("text").attr("text-anchor","middle").attr("dy",4)
+    .attr("fill","#fff").attr("font-size",9).attr("font-weight",900)
+    .text(d => d.goals + "G");
+
+  sim.on("tick", () => {
+    linkG.attr("x1",d=>d.source.x).attr("y1",d=>d.source.y).attr("x2",d=>d.target.x).attr("y2",d=>d.target.y);
+    nodeG.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+}
+
+// ─── SCORING RUNS ───────────────────────────────────────────────────────────
+function buildRuns() {
+  const el = document.getElementById("runs-container");
+  const maxG = 6;
+  el.innerHTML = QTR_DATA.map((gm, gi) => {
+    const bars = gm.gf.map((pG, qi) => {
+      const oG = gm.ga[qi];
+      const diff = pG - oG;
+      const isRun = diff >= 3;
+      const isOppRun = diff <= -3;
+      return `<div class="run-quarter">
+        <div class="run-pair">
+          <div class="run-bar" style="height:${pG/maxG*70}px;background:#003594"><div class="val" style="color:#1D4ED8">${pG}</div></div>
+          <div class="run-bar" style="height:${oG/maxG*70}px;background:#1A1E2E20"><div class="val" style="color:#1A1E2E80">${oG}</div></div>
+        </div>
+        <div class="run-qlabel">Q${qi+1}</div>
+        ${isRun ? '<div class="run-alert">⚡RUN</div>' : ''}
+        ${isOppRun ? '<div class="run-alert" style="color:#e74c3c">⚡OPP</div>' : ''}
+      </div>`;
+    }).join("");
+    let callout = "";
+    if (gi === 0) callout = `<div class="run-callout">Pitt won Q1 0-0 draw, dominated Q2 (4-3) and closed with 4 in Q4. Balanced scoring, no single-quarter surge.</div>`;
+    if (gi === 1) callout = `<div class="run-callout">Wire-to-wire lead. 4 goals in EACH quarter. Most complete performance of the season. 19/19 clearing. This is Pitt at their best at home.</div>`;
+    if (gi === 2) callout = `<div class="run-callout" style="border-color:rgba(231,76,60,0.3);color:#e74c3c">⚠ Down 5-1 after Q1. Scored 5 UNANSWERED in Q4 (incl. Clemens tying goal with 11 sec left). Lost in OT 1:40 in. Q4 Pitt is DANGEROUS.</div>`;
+    if (gi === 3) callout = `<div class="run-callout">Giandonato 5G career-high carried this game. Q3 surge (4-1) was the decisive period. Virginia Tech had no answer in the third.</div>`;
+    if (gi === 4) callout = `<div class="run-callout" style="border-color:rgba(231,76,60,0.3);color:#e74c3c">⚠ Down 5-2 after Q1 on the road AGAIN. Fought back but ND maintained tempo. Moon had 5A (record) but Pitt only converted 9 total. Road slow-start pattern confirmed.</div>`;
+    return `<div class="run-game">
+      <div class="run-header"><div class="run-team">${gm.gm}</div><div class="run-final">${gm.res}</div></div>
+      <div class="run-bars">${bars}</div>
+      ${callout}
+    </div>`;
+  }).join("");
+}
+
+// ─── PLAYER CARDS ───────────────────────────────────────────────────────────
+function buildPlayers() {
+  const el = document.getElementById("player-grid");
+  const games = ["OSU","DUKE","PSU","VT","ND"];
+  el.innerHTML = P_STATS.map(p => {
+    const pl = PLAYERS[p.id];
+    const totalG = p.goals.reduce((a,b)=>a+b,0);
+    const maxG = Math.max(...p.goals, 1);
+    const bars = p.goals.map((g, i) => {
+      const h = (g / maxG) * 28;
+      const col = g > 0 ? "#003594" : "#1A1E2E10";
+      return `<div style="text-align:center;flex:1"><div class="p-bar" style="width:100%;height:${h}px;background:${col}"></div><div class="p-bar-label">${games[i]}</div></div>`;
+    }).join("");
+    const convPct = p.sh > 0 ? ((totalG / p.sh)*100).toFixed(0) + "%" : "—";
+    return `<div class="p-card">
+      <div class="p-top">
+        <div><div class="p-name">#${pl.num} ${pl.name}</div><div class="p-meta">${pl.pos} · ${pl.yr}</div></div>
+        <div class="p-goals">${totalG}G</div>
+      </div>
+      <div class="p-stats">
+        <span>${p.a}A</span><span>${p.pts} pts</span><span>${p.sh} shots</span><span class="p-conv">${convPct} conv</span>
+        ${p.dc > 0 ? `<span>${p.dc} DC</span>` : ""}
+      </div>
+      <div class="p-bars">${bars}</div>
+    </div>`;
+  }).join("");
+}
+
+// ─── xG MODEL ───────────────────────────────────────────────────────────────
+function buildXG() {
+  const xgRates = {crease: 0.58, "8m": 0.38, "12m": 0.18};
+  const playerXG = {};
+  FIELD_SHOTS.forEach(s => {
+    if (!playerXG[s.p]) playerXG[s.p] = {shots:0, goals:0, xg:0};
+    const rate = s.z === "crease" ? xgRates.crease : s.z === "8m" ? xgRates["8m"] : xgRates["12m"];
+    playerXG[s.p].shots++;
+    playerXG[s.p].goals += s.g;
+    playerXG[s.p].xg += rate;
+  });
+
+  const data = Object.entries(playerXG).filter(([k]) => PLAYERS[k]).map(([k,v]) => ({
+    name: PLAYERS[k].name.split(" ").pop(),
+    goals: v.goals, xg: v.xg, fae: v.goals - v.xg, shots: v.shots
+  })).sort((a,b) => b.goals - a.goals);
+
+  // Bar chart
+  const svg = d3.select("#xg-svg");
+  svg.selectAll("*").remove();
+  const margin = {top:20,right:30,bottom:30,left:90};
+  const cW = 560 - margin.left - margin.right;
+  const cH = 340 - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
+
+  const y = d3.scaleBand().domain(data.map(d=>d.name)).range([0,cH]).padding(0.25);
+  const x = d3.scaleLinear().domain([0, d3.max(data, d=>Math.max(d.goals,d.xg))+2]).range([0,cW]);
+
+  g.selectAll(".xg-bar").data(data).join("rect")
+    .attr("x",0).attr("y",d=>y(d.name)).attr("width",d=>x(d.xg)).attr("height",y.bandwidth()/2)
+    .attr("fill","#1A1E2E15").attr("rx",2);
+
+  g.selectAll(".goal-bar").data(data).join("rect")
+    .attr("x",0).attr("y",d=>y(d.name)+y.bandwidth()/2).attr("width",d=>x(d.goals)).attr("height",y.bandwidth()/2)
+    .attr("fill","#003594").attr("rx",2);
+
+  g.selectAll(".name-label").data(data).join("text")
+    .attr("x",-6).attr("y",d=>y(d.name)+y.bandwidth()/2).attr("text-anchor","end")
+    .attr("fill","#1A1E2E").attr("font-size",10).attr("font-weight",700).text(d=>d.name);
+
+  g.selectAll(".xg-val").data(data).join("text")
+    .attr("x",d=>x(d.xg)+4).attr("y",d=>y(d.name)+y.bandwidth()/4+4)
+    .attr("fill","#1A1E2E60").attr("font-size",9).attr("font-weight",700).text(d=>`xG: ${d.xg.toFixed(1)}`);
+
+  g.selectAll(".g-val").data(data).join("text")
+    .attr("x",d=>x(d.goals)+4).attr("y",d=>y(d.name)+y.bandwidth()*3/4+4)
+    .attr("fill","#1D4ED8").attr("font-size",9).attr("font-weight",700).text(d=>`${d.goals}G`);
+
+  // Legend
+  g.append("rect").attr("x",cW-120).attr("y",-14).attr("width",10).attr("height",10).attr("fill","#1A1E2E15");
+  g.append("text").attr("x",cW-106).attr("y",-5).attr("fill","#1A1E2E60").attr("font-size",8).attr("font-weight",700).text("xG (Expected)");
+  g.append("rect").attr("x",cW-120).attr("y",0).attr("width",10).attr("height",10).attr("fill","#003594");
+  g.append("text").attr("x",cW-106).attr("y",9).attr("fill","#1D4ED8").attr("font-size",8).attr("font-weight",700).text("Actual Goals");
+
+  // FAE Table
+  const table = document.getElementById("xg-table");
+  table.innerHTML = `<tr><th>PLAYER</th><th>SHOTS</th><th>GOALS</th><th>xG</th><th>FAE</th><th>EFFICIENCY</th></tr>` +
+    data.map(d => {
+      const faeCls = d.fae > 0.5 ? "fae-pos" : d.fae < -0.5 ? "fae-neg" : "fae-zero";
+      const pct = d.shots > 0 ? (d.goals/d.shots*100).toFixed(0) : 0;
+      return `<tr><td style="font-weight:700">${d.name}</td><td>${d.shots}</td><td>${d.goals}</td><td>${d.xg.toFixed(1)}</td><td class="${faeCls}">${d.fae > 0 ? '+' : ''}${d.fae.toFixed(1)}</td><td><div class="xg-bar-bg"><div class="xg-bar-fill" style="width:${Math.min(pct,100)}%;background:${d.fae > 0 ? '#27ae60' : '#e74c3c'}"></div></div></td></tr>`;
+    }).join("");
+
+  // Interpretation
+  const topFAE = data.filter(d => d.fae > 0.5).map(d => d.name);
+  const lowFAE = data.filter(d => d.fae < -0.5).map(d => d.name);
+  document.getElementById("xg-interp-text").innerHTML = `
+    <strong>Players finishing ABOVE expected (positive FAE):</strong> ${topFAE.length > 0 ? topFAE.join(', ') + ' — these are elite finishers converting at above-average rates from their shot locations.' : 'No standout overperformers.'} ${lowFAE.length > 0 ? `<br><strong>Players finishing BELOW expected (negative FAE):</strong> ${lowFAE.join(', ')} — shooting below average from their zones, suggesting either poor shot selection or unlucky bounces. They may regress upward.` : ''}
+    <br><strong>Coaching note:</strong> Pitt's offense is most efficient inside the 8m (.380+ xG per shot) and on the crease (.580 xG). Force them outside 12m where each shot is worth only .180 xG. Pack the middle, concede outside shots.
+  `;
+
+  // Transition vs Settled
+  const transGoals = 13; // ~22% of 60 total
+  const settledGoals = 47;
+  const transShots = 20;
+  const settledShots = 125;
+  document.getElementById("transition-grid").innerHTML = `
+    <div class="eff-card"><div class="eff-label">TRANSITION</div><div class="eff-val" style="color:#9A6B00">${(transGoals/transShots*100).toFixed(0)}%</div><div class="eff-detail">${transGoals}G on ~${transShots} shots · ~22% of total goals</div></div>
+    <div class="eff-card"><div class="eff-label">SETTLED</div><div class="eff-val" style="color:#1D4ED8">${(settledGoals/settledShots*100).toFixed(0)}%</div><div class="eff-detail">${settledGoals}G on ~${settledShots} shots · ~78% of total goals</div></div>
+  `;
+}
+
+// ─── GSAx ───────────────────────────────────────────────────────────────────
+function buildGSAx() {
+  const xsvRates = {crease:0.32, "8m":0.42, "12m":0.55};
+  // GSAx cage grid
+  const gsaxData = [
+    {zone:"TOP-L",actual:3,expected:3.4,bg:""},
+    {zone:"TOP-C",actual:4,expected:4.2,bg:""},
+    {zone:"TOP-R",actual:3,expected:3.5,bg:""},
+    {zone:"MID-L",actual:5,expected:4.2,bg:""},
+    {zone:"MID-C",actual:6,expected:4.6,bg:""},
+    {zone:"MID-R",actual:5,expected:4.3,bg:""},
+    {zone:"LOW-L",actual:5,expected:4.0,bg:""},
+    {zone:"LOW-C",actual:6,expected:4.5,bg:""},
+    {zone:"LOW-R",actual:5,expected:4.2,bg:""},
+  ];
+  gsaxData.forEach(d => {
+    d.gsax = d.actual - d.expected;
+    d.bg = d.gsax >= 0 ? `rgba(39,174,96,${Math.min(Math.abs(d.gsax)/3,0.3)})` : `rgba(231,76,60,${Math.min(Math.abs(d.gsax)/3,0.3)})`;
+  });
+
+  const el = document.getElementById("gsax-cage-grid");
+  el.innerHTML = gsaxData.map(d => {
+    const color = d.gsax >= 0 ? "#27ae60" : "#e74c3c";
+    return `<div class="cage-cell" style="background:${d.bg}">
+      <div class="cage-pct" style="color:${color}">${d.gsax >= 0 ? '+' : ''}${d.gsax.toFixed(1)}</div>
+      <div class="cage-count">${d.actual} saves / ${d.expected.toFixed(1)} exp</div>
+      <div class="cage-label">${d.zone}</div>
+    </div>`;
+  }).join("");
+
+  const totalActual = gsaxData.reduce((a,d) => a + d.actual, 0); // ~42
+  const totalExpected = gsaxData.reduce((a,d) => a + d.expected, 0);
+  const overallGSAx = totalActual - totalExpected;
+  const gsaxColor = overallGSAx >= 0 ? "#27ae60" : "#e74c3c";
+
+  document.getElementById("gsax-overall").innerHTML = `<span style="color:${gsaxColor}">${overallGSAx >= 0 ? '+' : ''}${overallGSAx.toFixed(1)}</span>`;
+  document.getElementById("gsax-breakdown").innerHTML = `${totalActual} actual saves vs ${totalExpected.toFixed(1)} expected · ${overallGSAx >= 0 ? 'Saving more than average' : 'Saving fewer than average'}`;
+
+  // Per-game GSAx bar chart
+  const gameGSAx = [
+    {gm:"@ OSU", gsax: 10 - 8.4},
+    {gm:"vs Duke", gsax: 8 - 7.6},
+    {gm:"@ PSU", gsax: 9 - 9.8},
+    {gm:"vs VT", gsax: 10 - 7.5},
+    {gm:"@ ND", gsax: 10 - 9.5},
+  ];
+  const svg = d3.select("#gsax-bar-svg");
+  svg.selectAll("*").remove();
+  const margin = {top:20,right:20,bottom:30,left:60};
+  const cW = 560 - margin.left - margin.right;
+  const cH = 150 - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleBand().domain(gameGSAx.map(d=>d.gm)).range([0,cW]).padding(0.3);
+  const maxAbs = d3.max(gameGSAx, d => Math.abs(d.gsax)) + 1;
+  const y = d3.scaleLinear().domain([-maxAbs, maxAbs]).range([cH, 0]);
+
+  g.append("line").attr("x1",0).attr("x2",cW).attr("y1",y(0)).attr("y2",y(0)).attr("stroke","#1A1E2E30");
+
+  gameGSAx.forEach(d => {
+    const barY = d.gsax >= 0 ? y(d.gsax) : y(0);
+    const barH = Math.abs(y(d.gsax) - y(0));
+    g.append("rect").attr("x",x(d.gm)).attr("y",barY).attr("width",x.bandwidth()).attr("height",barH)
+      .attr("fill", d.gsax >= 0 ? "#27ae60" : "#e74c3c").attr("rx",2).attr("opacity",0.7);
+    g.append("text").attr("x",x(d.gm)+x.bandwidth()/2).attr("y", d.gsax >= 0 ? barY - 4 : barY + barH + 12)
+      .attr("text-anchor","middle").attr("fill",d.gsax >= 0 ? "#27ae60" : "#e74c3c").attr("font-size",10).attr("font-weight",900)
+      .text((d.gsax >= 0 ? "+" : "") + d.gsax.toFixed(1));
+    g.append("text").attr("x",x(d.gm)+x.bandwidth()/2).attr("y",cH+16).attr("text-anchor","middle")
+      .attr("fill","#1A1E2E60").attr("font-size",8).attr("font-weight",700).text(d.gm);
+  });
+}
+
+// ─── WIN PROB ───────────────────────────────────────────────────────────────
+function buildWinProb() {
+  const swings = [
+    {factor:"Draw Control 55%+ (Galica dominates)", wp:72, delta:"+14%", col:"#27ae60"},
+    {factor:"Draw Control < 45% (Carr dominates)", wp:44, delta:"-14%", col:"#e74c3c"},
+    {factor:"Virginia scores 3+ in Q1", wp:70, delta:"+12%", col:"#27ae60"},
+    {factor:"Pitt wins Q1 by 2+", wp:42, delta:"-16%", col:"#e74c3c"},
+    {factor:"UVA forces 15+ Pitt turnovers", wp:68, delta:"+10%", col:"#27ae60"},
+    {factor:"Pitt forces 15+ UVA turnovers", wp:40, delta:"-18%", col:"#e74c3c"},
+    {factor:"Finnelle .500+ save %", wp:66, delta:"+8%", col:"#27ae60"},
+    {factor:"Clemens/Giandonato combine 8+ goals", wp:38, delta:"-20%", col:"#e74c3c"},
+  ];
+  const el = document.getElementById("wp-swing-grid");
+  el.innerHTML = swings.map(s => `
+    <div class="wp-swing-card">
+      <div class="wp-swing-factor">${s.factor}</div>
+      <div class="wp-swing-bar"><div class="wp-swing-fill" style="width:${s.wp}%;background:${s.col}"></div></div>
+      <div style="display:flex;justify-content:space-between">
+        <span class="wp-swing-val" style="color:${s.col}">UVA ${s.wp}%</span>
+        <span class="wp-swing-note">${s.delta} from baseline</span>
+      </div>
+    </div>
+  `).join("");
+
+  // Scenario butterfly chart
+  const scenarios = [
+    {label:"Best Case UVA\nDraws + Q1 + TOs", wp:82},
+    {label:"Galica dominates\n+ Finnelle elite", wp:75},
+    {label:"BASELINE", wp:58},
+    {label:"Pitt home\n+ Carr wins draws", wp:40},
+    {label:"Worst Case UVA\nTOs + Q4 Pitt surge", wp:28},
+  ];
+  const svg = d3.select("#wp-scenario-svg");
+  svg.selectAll("*").remove();
+  const margin = {top:20,right:30,bottom:20,left:140};
+  const cW = 560 - margin.left - margin.right;
+  const cH = 220 - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
+
+  const y = d3.scaleBand().domain(scenarios.map(d=>d.label)).range([0,cH]).padding(0.3);
+  const x = d3.scaleLinear().domain([0,100]).range([0,cW]);
+
+  g.append("line").attr("x1",x(50)).attr("x2",x(50)).attr("y1",0).attr("y2",cH)
+    .attr("stroke","#1A1E2E20").attr("stroke-dasharray","4,4");
+
+  scenarios.forEach(s => {
+    const col = s.wp >= 58 ? "#E57200" : "#003594";
+    g.append("rect").attr("x",0).attr("y",y(s.label)).attr("width",x(s.wp)).attr("height",y.bandwidth())
+      .attr("fill",col).attr("rx",3).attr("opacity", s.label === "BASELINE" ? 0.9 : 0.6);
+    g.append("text").attr("x",x(s.wp)+6).attr("y",y(s.label)+y.bandwidth()/2+4)
+      .attr("fill","#1A1E2E").attr("font-size",12).attr("font-weight",900).text(s.wp+"%");
+    const lines = s.label.split("\n");
+    lines.forEach((line, i) => {
+      g.append("text").attr("x",-6).attr("y",y(s.label)+y.bandwidth()/2 + (i - (lines.length-1)/2)*11 + 4)
+        .attr("text-anchor","end").attr("fill","#1A1E2Eaa").attr("font-size",9).attr("font-weight",700).text(line);
+    });
+  });
+}
+
+// ─── DUEL CARDS ─────────────────────────────────────────────────────────────
+function buildDuels() {
+  const duels = [
+    {
+      p1:{name:"Giandonato",team:"PITT",stats:[{l:"2026 GOALS",v:"14"},{l:"SH%",v:".385"},{l:"THREAT",v:"8/10"}]},
+      p2:{name:"UVA Defense",team:"VIRGINIA",stats:[{l:"OPP GPG",v:"~11"},{l:"DISCIPLINE",v:"Improving"},{l:"ADVANTAGE",v:"7/10"}]},
+      edge:"even", edgeLabel:"SWING MATCHUP",
+      note:"Giandonato is a volume shooter who drives from midfield. Virginia's defense must force her outside 12m."
+    },
+    {
+      p1:{name:"Moon",team:"PITT",stats:[{l:"ASSISTS",v:"13"},{l:"VISION",v:"9/10"},{l:"SH%",v:".750"}]},
+      p2:{name:"Alaimo",team:"VIRGINIA",stats:[{l:"2025 ASSISTS",v:"58"},{l:"VISION",v:"10/10"},{l:"POINTS",v:"80"}]},
+      edge:"virginia", edgeLabel:"VIRGINIA EDGE",
+      note:"Both are elite playmakers. Alaimo has more experience and higher production ceiling. Moon is Pitt's engine — if she's neutralized, Pitt's attack fragments."
+    },
+    {
+      p1:{name:"Cain",team:"PITT",stats:[{l:"SV%",v:".460"},{l:"CAREER SVS",v:"200+"},{l:"Q4 CLUTCH",v:"9/10"}]},
+      p2:{name:"Finnelle",team:"VIRGINIA",stats:[{l:"CAREER SV%",v:".507"},{l:"BIG 12 GK/YR",v:"✓"},{l:"EXPERIENCE",v:"9/10"}]},
+      edge:"virginia", edgeLabel:"VIRGINIA EDGE",
+      note:"Finnelle is the superior goalkeeper by every metric. This is the matchup Virginia wants — Finnelle's .507 vs Cain's .460 is a meaningful advantage over 60 minutes."
+    },
+    {
+      p1:{name:"Carr",team:"PITT",stats:[{l:"2025 DCS",v:"85"},{l:"PEAK GAME",v:"10 DC"},{l:"TECHNIQUE",v:"8/10"}]},
+      p2:{name:"Galica",team:"VIRGINIA",stats:[{l:"2025 DCS",v:"179"},{l:"ALL-AMERICAN",v:"1st Team"},{l:"TECHNIQUE",v:"10/10"}]},
+      edge:"virginia", edgeLabel:"VIRGINIA EDGE",
+      note:"Galica is the clear favorite. She won draws 18-14 in the 2025 H2H (vs Pitt's previous specialist). Carr is good but not All-American caliber. Virginia should win 55%+ of draws."
+    },
+    {
+      p1:{name:"McGonagle",team:"PITT",stats:[{l:"CT/GAME",v:"3.0"},{l:"ACC RANK",v:"#2"},{l:"INTENSITY",v:"9/10"}]},
+      p2:{name:"DiNardo",team:"VIRGINIA",stats:[{l:"2025 GOALS",v:"53"},{l:"FINISHING",v:"9/10"},{l:"VOLUME",v:"High"}]},
+      edge:"even", edgeLabel:"KEY BATTLE",
+      note:"McGonagle is Pitt's defensive breakout star (IWLCA Def POW). DiNardo is an elite finisher. This is skill vs skill — whoever wins this 1v1 likely decides the game's margins."
+    },
+    {
+      p1:{name:"Pitt Zone DEF",team:"PITT",stats:[{l:"CT/GAME",v:"~10"},{l:"SCHEME",v:"Zone flood"},{l:"WEAKNESS",v:"Seams"}]},
+      p2:{name:"Alaimo + Foster",team:"VIRGINIA",stats:[{l:"COMBINED PTS",v:"120+"},{l:"BALL MOVEMENT",v:"Elite"},{l:"VISION",v:"10/10"}]},
+      edge:"virginia", edgeLabel:"VIRGINIA EDGE",
+      note:"Pitt's zone floods the ball but creates seams between front and back units. Alaimo's elite passing exploits exactly this type of defense. Extra passes will unlock open looks."
+    },
+  ];
+  const el = document.getElementById("duel-grid");
+  el.innerHTML = duels.map(d => {
+    const edgeCls = d.edge === "pitt" ? "edge-pitt" : d.edge === "virginia" ? "edge-virginia" : "edge-even";
+    const rows = d.p1.stats.map((s, i) => `
+      <div class="duel-stat-row">
+        <div class="duel-stat-val left" style="color:#1D4ED8">${s.v}</div>
+        <div class="duel-stat-label">${s.l}</div>
+        <div class="duel-stat-val right" style="color:var(--uva-orange)">${d.p2.stats[i].v}</div>
+      </div>
+    `).join("");
+    return `<div class="duel-card">
+      <div class="duel-header">
+        <div class="duel-player"><div class="duel-name">${d.p1.name}</div><div class="duel-team">${d.p1.team}</div></div>
+        <div style="color:#1A1E2E30;font-weight:900;font-size:14px;font-family:'Barlow Condensed'">VS</div>
+        <div class="duel-player"><div class="duel-name">${d.p2.name}</div><div class="duel-team">${d.p2.team}</div></div>
+      </div>
+      ${rows}
+      <div class="duel-edge ${edgeCls}">${d.edgeLabel}</div>
+      <p style="font-size:9px;color:var(--muted);margin-top:6px;line-height:1.4">${d.note}</p>
+    </div>`;
+  }).join("");
+}
+
+// ─── MOMENTUM ───────────────────────────────────────────────────────────────
+function buildMomentum() {
+  const momSeries = [];
+  let runningMI = 0;
+  const alpha = 0.5;
+  QTR_DATA.forEach((gm, gi) => {
+    gm.gf.forEach((pG, qi) => {
+      const oG = gm.ga[qi];
+      const diff = pG - oG;
+      runningMI = alpha * diff + (1 - alpha) * runningMI;
+      momSeries.push({gi, qi, idx: gi*4+qi, diff, mi: runningMI, pittG: pG, oppG: oG, game: gm.gm});
+    });
+  });
+
+  const svg = d3.select("#momentum-svg");
+  svg.selectAll("*").remove();
+  const margin = {top:20,right:20,bottom:30,left:40};
+  const cW = 560 - margin.left - margin.right;
+  const cH = 280 - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0, momSeries.length-1]).range([0, cW]);
+  const maxMI = d3.max(momSeries, d => Math.abs(d.mi)) + 0.5;
+  const y = d3.scaleLinear().domain([-maxMI, maxMI]).range([cH, 0]);
+
+  g.append("line").attr("x1",0).attr("x2",cW).attr("y1",y(0)).attr("y2",y(0)).attr("stroke","#1A1E2E20");
+
+  // Area
+  const area = d3.area().x(d=>x(d.idx)).y0(y(0)).y1(d=>y(d.mi)).curve(d3.curveMonotoneX);
+  const posData = momSeries.map(d=>({...d, mi: Math.max(0,d.mi)}));
+  g.append("path").datum(posData).attr("d",area).attr("fill","rgba(0,53,148,0.25)");
+  const negData = momSeries.map(d=>({...d, mi: Math.min(0,d.mi)}));
+  g.append("path").datum(negData).attr("d",area).attr("fill","rgba(229,114,0,0.15)");
+
+  const line = d3.line().x(d=>x(d.idx)).y(d=>y(d.mi)).curve(d3.curveMonotoneX);
+  g.append("path").datum(momSeries).attr("d",line).attr("fill","none").attr("stroke","#C99700").attr("stroke-width",2.5);
+
+  momSeries.forEach(d => {
+    const isRun = Math.abs(d.diff) >= 3;
+    g.append("circle").attr("cx",x(d.idx)).attr("cy",y(d.mi)).attr("r", isRun ? 6 : 3.5)
+      .attr("fill", d.mi >= 0 ? "#003594" : "#E57200")
+      .attr("stroke", isRun ? "#B45309" : "none").attr("stroke-width", isRun ? 2 : 0);
+  });
+
+  // Game labels
+  const gameStarts = {};
+  momSeries.forEach(d => { if (!gameStarts[d.gi]) gameStarts[d.gi] = d.idx; });
+  Object.entries(gameStarts).forEach(([gi, startIdx]) => {
+    const gm = QTR_DATA[+gi].gm.replace(/^(vs |@ )/, '');
+    g.append("text").attr("x",x(startIdx+1.5)).attr("y",cH+16).attr("text-anchor","middle")
+      .attr("fill","#1A1E2E60").attr("font-size",8).attr("font-weight",700).text(gm);
+  });
+
+  g.append("text").attr("x",-6).attr("y",10).attr("text-anchor","end").attr("fill","#1D4ED8").attr("font-size",7).attr("font-weight",700).text("PITT+");
+  g.append("text").attr("x",-6).attr("y",cH-4).attr("text-anchor","end").attr("fill","#E57200").attr("font-size",7).attr("font-weight",700).text("OPP+");
+
+  // Run patterns
+  const runs = momSeries.filter(d => Math.abs(d.diff) >= 3);
+  document.getElementById("run-patterns").innerHTML = runs.length > 0 ?
+    runs.map(r => {
+      const isPitt = r.diff > 0;
+      return `<p style="font-size:11px;color:var(--text);margin-bottom:6px"><strong style="color:${isPitt ? '#9A6B00' : '#E57200'}">⚡ ${r.game} Q${r.qi+1}:</strong> ${isPitt ? 'Pitt' : 'Opponent'} outscored ${isPitt ? r.pittG+'-'+r.oppG : r.oppG+'-'+r.pittG} (${isPitt ? '+' : ''}${r.diff}). MI = ${r.mi.toFixed(2)}. ${r.qi === 3 && isPitt ? 'Q4 SURGE — Pitt\'s most dangerous period.' : r.qi === 0 && !isPitt ? 'Q1 slow start — road game pattern.' : 'Scoring burst detected.'}</p>`;
+    }).join("") :
+    '<p style="font-size:11px;color:var(--muted)">No single-quarter ±3 runs detected.</p>';
+
+  // WPA events
+  const wpaEvents = [
+    {event:"Clemens tying goal (11 sec left) vs PSU",wpa:"+38%",detail:"Most dramatic moment in program history. Forced overtime from 5 goals down."},
+    {event:"Giandonato 5G vs Virginia Tech",wpa:"+32%",detail:"Career-high performance earned IWLCA Offensive POW. Single-handedly carried the game."},
+    {event:"Moon 5A vs Notre Dame",wpa:"+22%",detail:"Program single-game assist record. Created looks for 4 different scorers despite the loss."},
+    {event:"PSU 5-1 Q1 run vs Pitt",wpa:"-35%",detail:"The road slow-start pattern at its worst. Pitt couldn't solve Penn State's early pressure."},
+    {event:"Pitt 17-10 vs #14 Duke",wpa:"+40%",detail:"Highest-WPA game outcome. Program's biggest ranked upset and first national ranking."},
+  ];
+  document.getElementById("wpa-events").innerHTML = wpaEvents.map(e =>
+    `<p style="font-size:11px;color:var(--text);margin-bottom:5px"><strong style="color:${e.wpa.startsWith('+') ? '#9A6B00' : '#E57200'}">${e.wpa}</strong> ${e.event} — <span style="color:var(--muted)">${e.detail}</span></p>`
+  ).join("");
+}
+
+// ─── DATA SOURCES ───────────────────────────────────────────────────────────
+function buildSources() {
+  const groups = [
+    {cat:"BOX SCORES & GAME RECAPS (2026)",items:[
+      {n:"Pitt 13-10 @ Ohio State (Feb 7)",u:"pittsburghpanthers.com/news/2026/2/7",d:"Telatovich 4G. Cain 200th career save. 5th straight season-opening win. 17-8 draw control edge."},
+      {n:"Pitt 17-10 vs #14 Duke (Feb 12)",u:"pittsburghpanthers.com/news/2026/2/12",d:"Historic win at Highmark. 7 different scorers. McNierney 4G (first 3 goals of game). 19/19 clears. Carr 10 DCs."},
+      {n:"Pitt 11-12 OT @ #23 Penn State (Feb 18)",u:"pittsburghpanthers.com/news/2026/2/18 + psucommradio + onwardstate",d:"Down 5-1 Q1. 5 unanswered Q4. Clemens tying goal 11 sec left. Lost on golden goal 1:40 OT."},
+      {n:"Pitt 10-8 vs Virginia Tech (Feb 22)",u:"pittsburghpanthers.com/news/2026/2/22 + pittnews.com",d:"Giandonato 5G career-high. McGonagle 4 CT, 4 GB. First 2-0 ACC start in program history."},
+      {n:"Pitt 9-12 @ #8 Notre Dame (Feb 28)",u:"pittsburghpanthers.com/news/2026/2/28",d:"Moon 5A (program record). Clemens 3G/1A. Down 5-2 Q1 — road slow-start pattern. Cain 7 of 10 saves in Q4."},
+    ]},
+    {cat:"2025 HEAD-TO-HEAD",items:[
+      {n:"Virginia 16, Pittsburgh 12 (March 22, 2025)",u:"virginiasports.com/news/2025/03/22 + pittsburghpanthers.com preview",d:"Alaimo 3G/6A (9 pts career high). DiNardo 3G/2A. Foster 3G/1A. Galica 11 DC (18-14 draw edge). Pitt: Hendrickson 5G, Giandonato 3G. Gap closed from 19-10 (2024) to 16-12."},
+    ]},
+    {cat:"ROSTER & PROGRAM INTEL",items:[
+      {n:"2026 Team Captains",u:"pittsburghpanthers.com/news/2025/11/19",d:"All 4 captains are defenders: Sheridan, Carannante, Kahoun, Long. Defensive identity confirmed."},
+      {n:"Emily Boissonneault — HC Bio",u:"pittsburghpanthers.com/staff-directory/emily-boissonneault",d:"Founding coach (hired 2019). JMU associate HC during 2018 NCAA Championship. Ran JMU's defensive unit. Detroit Mercy HOF. Team Canada gold medal."},
+      {n:"Key Departures from 2025",u:"pittsburghpanthers.com roster comparison",d:"Jenna Hendrickson (5G vs UVA 2025, program goal record). Sydney Naylor (5G vs UVA 2024, 100+ career pts). Both graduated. Significant offensive losses."},
+      {n:"Key Addition: Emily Clemens",u:"pittsburghpanthers.com/roster/emily-clemens",d:"Transfer. Immediate impact — 9G including hat tricks in both losses. Pitt's best closer and Q4 weapon."},
+      {n:"First-Ever National Ranking (#24 IWLCA)",u:"si.com/college/pittsburgh + pittsburghpanthers.com/news/2026/2/16",d:"Earned after 2-0 start (Ohio State, #14 Duke). Program milestone in Year 5 under Boissonneault."},
+      {n:"McGonagle National Player of the Week",u:"pittsburghpanthers.com/news/2026/2/24",d:"Lainey McGonagle earned IWLCA Defensive POW after 4 CT/4 GB vs Virginia Tech. Tied program CT record (6) at PSU."},
+    ]},
+    {cat:"VIRGINIA CONTEXT",items:[
+      {n:"Virginia 2026 Results (2-4, 1-1 ACC)",u:"virginiasports.com schedule",d:"L Navy 10-12, L Richmond 11-12, L Maryland 9-17, W Liberty 17-8, W Notre Dame 9-7, L Stanford 8-16. Record doesn't reflect talent."},
+      {n:"Cavalier Daily 50th Anniversary Season Preview",u:"cavalierdaily.com/article/2026/02",d:"Galica 282+ career DCs. Alaimo Tewaaraton Watch List. DiNardo primary scorer. Finnelle (Florida transfer) at GK."},
+    ]},
+    {cat:"⚠ DATA LIMITATIONS — READ BEFORE USING",warn:true,items:[
+      {n:"Shot locations → ESTIMATED",u:"NOT FROM HUDL/SYNERGY TRACKING",d:"Reconstructed from game recaps, box scores, and player tendency profiles. Directionally accurate but NOT precise coordinates. Validate against Hudl film."},
+      {n:"Cain GK zones → ESTIMATED from season aggregate",u:"NOT FROM ZONE-SPECIFIC SHOT CHART",d:"Save zones inferred from total saves and shot descriptions across 5 games. Small sample per zone. Treat as directional, not definitive."},
+      {n:"Assist network → RECONSTRUCTED",u:"FROM GOAL DESCRIPTIONS IN RECAPS",d:"Direct assist connections only. Moon's 5A vs Notre Dame confirmed; other games estimated from recap language."},
+      {n:"Player per-game goals → VERIFIED where possible",u:"BOX SCORES + RECAPS",d:"Ohio State, Duke, Penn State, VT, Notre Dame recaps all checked. Some individual game splits estimated ±1G."},
+    ]},
+    {cat:"⚠ ANALYTICS MODEL METHODOLOGY",warn:true,items:[
+      {n:"xG → ZONE-BASED BASELINE",u:"NCAA D1 aggregate data (approximate)",d:"Crease=0.58, 8m=0.38, 12m+=0.18 conversion rates. LEAGUE AVERAGES, not Pitt-specific. Simplified directional model."},
+      {n:"xSV / GSAx → ZONE-BASED BASELINE",u:"Inverse of xG rates",d:"GSAx = Actual Saves − Expected Saves. 5-game sample. Directional, not definitive."},
+      {n:"Win Probability → FEATURE-WEIGHTED LOGISTIC",u:"Custom model, not validated",d:"Weights assigned by analyst judgment. 58% UVA baseline is an informed estimate, not a statistically rigorous probability."},
+      {n:"Momentum Index → SIMPLIFIED EWM",u:"Quarter-level aggregation only",d:"Alpha=0.5 exponential weighting on quarter goal differentials. Misses within-quarter shifts."},
+      {n:"Duel Card ratings → SUBJECTIVE",u:"Analyst judgment from film + box score",d:"1-10 ratings are discussion framework, not definitive rankings."},
+    ]},
+  ];
+  document.getElementById("sources-container").innerHTML = groups.map(grp => `
+    <div class="src-group">
+      <div class="src-cat">${grp.cat}</div>
+      ${grp.items.map(it => `<div class="src-item ${grp.warn?'warn':''}"><div class="src-name">${it.n}</div><div class="src-url">${it.u}</div><div class="src-note">${it.d}</div></div>`).join("")}
+    </div>
+  `).join("");
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+drawField();
+buildCageGrid("gk-cage-grid", CAIN_GK, "gk");
+buildGKTargets();
+buildNetwork();
+buildRuns();
+buildPlayers();
+buildXG();
+buildGSAx();
+buildWinProb();
+buildDuels();
+buildMomentum();
+buildSources();
+</script>
+</body>
+</html>
